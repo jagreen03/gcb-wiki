@@ -4,7 +4,7 @@ The whole fabric in one screen: five blocks and the signals between them. Every
 Level 1 document zooms into one of these arrows.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Compute Tier
         Core[RISC-V Core]
     end
@@ -56,7 +56,10 @@ This diagram simplifies for readability; the binding definitions are in
 
 - [`01_streaming_sequence.md`](01_streaming_sequence.md) — the Core → Shim →
   Pilot → Optics → ADC path for one reduction.
-- *(planned)* `02_buffer_halt_state.md` — the pilot's firing sequencer state
+- [`02_receiver_architecture.md`](02_receiver_architecture.md) — the Phase I
+  COTS PD → TIA → ADC path vs. the Phase II local-integration + TDC path, and
+  the no-routed-analog-voltage invariant.
+- *(planned)* `03_buffer_halt_state.md` — the pilot's firing sequencer state
   machine.
-- *(planned)* `03_calibration_flow.md` — the MDL / tap-balance calibration
+- *(planned)* `04_calibration_flow.md` — the MDL / tap-balance calibration
   against the pilot registers.
