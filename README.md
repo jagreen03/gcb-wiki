@@ -33,6 +33,7 @@ digestible and avoids a single spaghetti graph.
 | 03 | [`03_dual_mode_integration.md`](03_dual_mode_integration.md) | L1 | V1.0 electrical / V2.0 photonic dual-mode top-level; CSR mode select; K_MAX = 16 unification |
 | 04 | [`04_ai_protocols_and_blue_wording.md`](04_ai_protocols_and_blue_wording.md) | — | Hard definitions: PGB Triad & Cyclopter (prompt-layer protocols), Blue Wording (data-format spec) — none are GCB hardware |
 | 05 | [`05_photonic_memory_dataflow.md`](05_photonic_memory_dataflow.md) | L1 | Quantitative GDDR7 bandwidth (9 GB/s) and Engine-Local SRAM sizing (4.5 MB) for the 256-core Photonic Tensor Complex on a 4096x4096x4096 INT4 matmul |
+| 06 | [`06_70B_transformer_workload_trace.md`](06_70B_transformer_workload_trace.md) | L1 | Hybrid Photonic/Vortex partitioning and a cycle-by-cycle GDDR7/SRAM trace of a LLaMA-class 70B FFN up-projection (7 GB/s, 9 MiB SRAM), validated against the existing `gcb_tensor_memory_engine` RTL parameters |
 
 ## Conventions
 
