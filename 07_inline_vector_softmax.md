@@ -6,7 +6,8 @@ sec. 2) creates if left unaddressed, and defines the fix: the Photonic Rx
 Digital Recombiner's result stream feeds an **inline** Vortex vector unit —
 data stays on-chip through Softmax, only the finished activations ever reach
 GDDR7. This document is the gate `rtl/gcb_inline_vector_unit.sv`'s structural
-skeleton is scaffolded against; the hardware TLU math itself is a later task.
+skeleton is scaffolded against; sec. 4 defines the base-2 decomposition its
+`ST_TLU_EXP` hardware math implements.
 
 > **Result.** For one LLaMA-70B-class prefill layer's attention softmax
 > (N=4096, 64 heads, INT16 scores), writing the raw $N{\times}N$ score
@@ -107,16 +108,15 @@ flowchart LR
   transcendental function unit — Softmax's numerically stable form,
   $\mathrm{softmax}(x)_i = \dfrac{e^{x_i - \max(x)}}{\sum_j e^{x_j - \max(x)}}$,
   needs $\exp$ evaluated once per element, $N^2$ times per head per layer.
-  A TLU (interpolated lookup table, precision TBD) keeps this a fixed-latency
-  hardware op instead of an iterative digital approximation — the actual
-  table contents and interpolation scheme are explicitly **not** designed
-  yet (sec. 4).
+  A TLU keeps this a fixed-latency hardware op instead of an iterative
+  digital approximation — the base-2 decomposition that makes a single
+  small ROM sufficient is sec. 4.
 
 ## 3. Hardware Softmax, Structurally
 
-Four-stage FSM (`rtl/gcb_inline_vector_unit.sv`'s skeleton, sec. 4), matching
-the numerically-stable Softmax algorithm's own data dependencies exactly —
-each stage's output is a real input the next stage cannot start without:
+Four-stage FSM (`rtl/gcb_inline_vector_unit.sv`), matching the numerically
+stable Softmax algorithm's own data dependencies exactly — each stage's
+output is a real input the next stage cannot start without:
 
 | state | reads | produces | why it's a separate stage |
 |---|---|---|---|
@@ -125,11 +125,91 @@ each stage's output is a real input the next stage cannot start without:
 | `ST_SUM_EXP` | $e^{x_i-\max(x)}$ values | $\sum_i e^{x_i - \max(x)}$ | needs every exponentiated value, so cannot overlap the stage producing them element-by-element without a running-sum variant (sec. 4's skeleton keeps the stages separate; an online/fused variant is a later optimization, not a correctness requirement) |
 | `ST_NORMALIZE` | $e^{x_i-\max(x)}$ values; the sum | $\mathrm{softmax}(x)_i\ \forall i$, streamed to GDDR7 | the only stage whose output is the thing that actually leaves the chip |
 
-## 4. Explicitly Out of Scope (This Document, and the RTL Skeleton It Gates)
+## 4. Base-2 Hardware Exponentiation (the TLU)
 
-- The TLU's actual table contents, interpolation order, and fixed-point
-  format for $e^x$ — `rtl/gcb_inline_vector_unit.sv` defines the FSM and
-  interface boundary only; `ST_TLU_EXP` is a named, empty state.
+$e^x$ has no cheap direct hardware form, but $2^x$ does — a fixed-point
+integer/fractional split, a shifter, and a small ROM, all of which already
+exist as primitives elsewhere in this design. The identity that makes this
+work:
+
+$$e^x = 2^{x \cdot \log_2 e}, \qquad \log_2 e \approx 1.4426950408889634$$
+
+Let $y = x \cdot \log_2 e$ and split it into an integer part $n = \lfloor y
+\rfloor$ and a fractional part $f = y - n \in [0, 1)$:
+
+$$e^x = 2^y = 2^{n+f} = \underbrace{2^n}_{\text{shift}} \times \underbrace{2^f}_{\text{ROM lookup}}$$
+
+$2^n$ — an integer power of two — is a bit shift: cheap, exact, and (per
+sec. 4.2) only ever a *right* shift here. $2^f$ for $f \in [0,1)$ is a
+smooth, bounded ($[1, 2)$) function of a small fractional value — exactly
+what a small ROM is for.
+
+### 4.1 Fixed-point representation
+
+$\log_2 e$ itself has to be a fixed-point constant to multiply in hardware.
+Q8 (8 fractional bits — chosen to match the ROM's own address width, sec.
+4.3):
+
+$$\texttt{LOG2E\_Q8} = \mathrm{round}(1.4426950408889634 \times 256) = 369 = \texttt{10'h171}$$
+
+$369/256 = 1.44140625$ — a $0.089\%$ relative error against the true
+constant, from Q8 rounding alone. $y_{fixed} = x \times \texttt{LOG2E\_Q8}$
+is then $y$ itself, represented in Q8 (i.e. $y = y_{fixed}/256$), computed
+with one multiply: a 16-bit signed `x` (the score, `accum_t`) against a
+10-bit signed constant gives a 26-bit signed product.
+
+### 4.2 Splitting $y_{fixed}$ costs nothing extra — two's complement already
+did it
+
+For $x = \mathrm{score} - \max(\mathrm{scores})$ — sec. 3's numerically
+stable form — $x \le 0$ always, so $y \le 0$ always, so $n \le 0$ always: no
+left-shift case exists in this application, ever. This is exactly the
+"handle the sign bit correctly" case: floor() of a two's-complement
+fixed-point value is *not* the same operation as truncating a sign-magnitude
+one, and getting this wrong is the standard way to introduce an off-by-one
+at every negative boundary (e.g. $\lfloor -0.3 \rfloor = -1$, not $0$).
+
+The reason it costs nothing extra: in two's complement, taking the top bits
+of $y_{fixed}$ as a signed value via an **arithmetic** right shift already
+computes $\lfloor y \rfloor$ correctly — for negative $y$ too — and the
+bottom 8 bits, read as an **unsigned** value, are already $f \times 256$
+exactly. No separate floor() or subtraction is needed:
+
+$$n = y_{fixed} \texttt{ >>> } 8 \qquad\text{(arithmetic shift — sign-extends)}$$
+$$f_{addr} = y_{fixed}\texttt{[7:0]} \qquad\text{(unsigned — directly addresses the ROM)}$$
+
+### 4.3 The ROM: 256 entries, $2^f$ for $f = i/256,\ i \in [0,256)$
+
+$$\texttt{TLU\_ROM}[i] = \mathrm{round}\!\left(2^{\,i/256} \times 256\right), \qquad i = 0 \ldots 255$$
+
+Values run from `TLU_ROM[0] = 256` ($2^0 = 1.0$) to `TLU_ROM[255] = 511`
+($2^{255/256} \approx 1.9915$) — real computed values (Q8 fixed point), not
+placeholder or random hex; this is a genuine, working, unrounded-in-the-
+mathematical-sense $2^f$ lookup, not a mock. What it deliberately still is:
+a **zeroth-order** table (nearest-bin lookup, no interpolation between
+entries). At 256 entries the bin width is $\Delta f = 1/256$, and $2^f$'s
+own local slope near $f$ is $\approx \ln 2 \times 2^f$, so the worst-case
+step error from not interpolating is on the order of
+$\ln 2 / 256 \approx 0.27\%$ relative — small, and an explicit, documented
+simplification (interpolation is a real, valid future refinement, not
+implemented here).
+
+### 4.4 Final scale: always a right shift, never a left one
+
+$$e^x \approx \texttt{TLU\_ROM}[f_{addr}] \texttt{ >> } |n|$$
+
+Because sec. 4.2 already established $n \le 0$ always in this application,
+`|n|` is simply `-n`, and the shift is a single, always-present right shift
+— no shift-direction mux, no left-shift datapath to build or verify. Very
+negative `x` (far below the row max) drives `|n|` large enough to shift the
+ROM value's few significant bits entirely out, correctly underflowing to
+$0$ — exactly the behavior a distant-from-the-max Softmax term should have.
+
+## 5. Explicitly Out of Scope (This Document, and the RTL Skeleton It Gates)
+
+- Interpolating between adjacent ROM entries (sec. 4.3's $\approx 0.27\%$
+  bound) — a real refinement once the zeroth-order version is verified, not
+  designed here.
 - Fusing `ST_SUM_EXP` into `ST_TLU_EXP` (an online/running-sum Softmax) —
   a real, valid future optimization once the TLU itself exists; keeping them
   separate now keeps the skeleton's data dependencies legible.
@@ -137,6 +217,10 @@ each stage's output is a real input the next stage cannot start without:
   back at $W_O$ without a GDDR7 round trip — sec. 1.2 established the same
   tax applies to both; both are the same fix, applied elsewhere, not
   designed here.
+- `ST_NORMALIZE`'s actual division ($e^{x_i-\max}/\sum_j e^{x_j-\max}$) — a
+  hardware divider is its own task, arguably as much later-task numerics as
+  $\exp$ was before this document; the ROM/shift datapath sec. 4 defines
+  does not touch it.
 - Where the staging SRAM's capacity comes from in the Engine-Local SRAM
   budget doc 05 sec. 7 already sized — this document defines the interface
   and the row-buffering requirement; sizing it against the existing 9 MiB
@@ -146,7 +230,7 @@ each stage's output is a real input the next stage cannot start without:
 
 - [`05_photonic_memory_dataflow.md`](05_photonic_memory_dataflow.md) — the
   GDDR7 bandwidth figures (128 GB/s/device) sec. 1.2's latency estimate
-  reuses directly, and the Engine-Local SRAM budget sec. 4 will eventually
+  reuses directly, and the Engine-Local SRAM budget (sec. 7) will eventually
   size the staging buffer against.
 - [`06_70B_transformer_workload_trace.md`](06_70B_transformer_workload_trace.md)
   — the Photonic/Vortex partitioning this handoff sits at the boundary of,
