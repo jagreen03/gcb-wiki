@@ -188,11 +188,12 @@ placeholder or random hex; this is a genuine, working, unrounded-in-the-
 mathematical-sense $2^f$ lookup, not a mock. What it deliberately still is:
 a **zeroth-order** table (nearest-bin lookup, no interpolation between
 entries). At 256 entries the bin width is $\Delta f = 1/256$, and $2^f$'s
-own local slope near $f$ is $\approx \ln 2 \times 2^f$, so the worst-case
+own local slope near $f$ is $\approx \ln 2 \times 2^f$, so the ROM's *own*
 step error from not interpolating is on the order of
-$\ln 2 / 256 \approx 0.27\%$ relative — small, and an explicit, documented
-simplification (interpolation is a real, valid future refinement, not
-implemented here).
+$\ln 2 / 256 \approx 0.27\%$ relative, in isolation — small, and an
+explicit, documented simplification (interpolation is a real, valid
+future refinement, not implemented here). This is *not* the pipeline's
+end-to-end error — sec. 4.4 measures that.
 
 ### 4.4 Final scale: always a right shift, never a left one
 
@@ -204,6 +205,22 @@ Because sec. 4.2 already established $n \le 0$ always in this application,
 negative `x` (far below the row max) drives `|n|` large enough to shift the
 ROM value's few significant bits entirely out, correctly underflowing to
 $0$ — exactly the behavior a distant-from-the-max Softmax term should have.
+
+`>>` **truncates** (rounds toward zero), not round-to-nearest — the
+simplest hardware, at the cost of compounding with sec. 4.1's $\log_2 e$
+rounding and sec. 4.3's ROM step error rather than sitting cleanly beside
+them. Measured directly against `rtl/gcb_inline_vector_unit.sv` (not just
+derived): $x{=}{-1} \to 0.19\%$ error, $x{=}{-2} \to 1.9\%$,
+$x{=}{-5} \to 42\%$ — **relative** error grows sharply as $x$ moves further
+from the max, because truncation discards a growing fraction of an
+already-small integer. This is the correct trade for Softmax specifically,
+not a defect to fix later: a far-from-the-max term is already being driven
+toward the correctly-negligible end of the distribution, so its worsening
+*relative* precision never perturbs `ST_SUM_EXP`'s sum or the final
+normalized output in any way that matters — the error concentrates exactly
+where it is harmless. Sec. 4.3's $0.27\%$ figure remains true as stated,
+scoped to the ROM step alone; quote it as that, not as this datapath's
+overall accuracy.
 
 ## 5. Explicitly Out of Scope (This Document, and the RTL Skeleton It Gates)
 
