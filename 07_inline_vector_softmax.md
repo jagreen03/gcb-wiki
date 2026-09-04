@@ -195,6 +195,18 @@ explicit, documented simplification (interpolation is a real, valid
 future refinement, not implemented here). This is *not* the pipeline's
 end-to-end error — sec. 4.4 measures that.
 
+**Exact sizing.** Every entry's significant range is $[256, 511]$ — 9 bits
+would hold it exactly — but `rtl/gcb_inline_vector_unit.sv` declares each
+entry `logic [15:0]`, not `[8:0]`: 16 bits for byte alignment and headroom
+against a future wider fixed-point format, at a real, accepted cost —
+
+$$256 \times 16\ \text{bits} = 4{,}096\ \text{bits} = \mathbf{512\ B}$$
+
+— against $256 \times 9 = 2{,}304$ bits ($288$ B) at the tight minimum: 224 B
+(1.78x) spent on alignment, not precision. Trivial against the 9 MiB
+Engine-Local SRAM macro (doc 05 sec. 7) this ROM sits beside — the choice
+is stated here for completeness, not because the overhead is a concern.
+
 ### 4.4 Final scale: always a right shift, never a left one
 
 $$e^x \approx \texttt{TLU\_ROM}[f_{addr}] \texttt{ >> } |n|$$
@@ -209,8 +221,8 @@ $0$ — exactly the behavior a distant-from-the-max Softmax term should have.
 `>>` **truncates** (rounds toward zero), not round-to-nearest — the
 simplest hardware, at the cost of compounding with sec. 4.1's $\log_2 e$
 rounding and sec. 4.3's ROM step error rather than sitting cleanly beside
-them. Measured directly against `rtl/gcb_inline_vector_unit.sv` (not just
-derived): $x{=}{-1} \to 0.19\%$ error, $x{=}{-2} \to 1.9\%$,
+them. Measured directly against `rtl/gcb_inline_vector_unit.sv`, not just
+derived: $x{=}{-1} \to 0.19\%$ error, $x{=}{-2} \to 1.9\%$,
 $x{=}{-5} \to 42\%$ — **relative** error grows sharply as $x$ moves further
 from the max, because truncation discards a growing fraction of an
 already-small integer. This is the correct trade for Softmax specifically,
@@ -221,6 +233,21 @@ normalized output in any way that matters — the error concentrates exactly
 where it is harmless. Sec. 4.3's $0.27\%$ figure remains true as stated,
 scoped to the ROM step alone; quote it as that, not as this datapath's
 overall accuracy.
+
+### 4.5 Formally verified
+
+The numbers above came from an ad hoc throwaway check while landing the
+RTL. `tb/tb_gcb_inline_vector_unit.sv` (`gcb-wdm-transceiver`,
+commit `8e5967d`) supersedes it with a committed, repeatable formal
+testbench: an independent golden model re-derives the entire sec. 4
+algorithm from scratch — including the 256-entry ROM, recomputed via real
+$2^f$ arithmetic rather than copied from the RTL's own literal table, so a
+shared typo could not self-confirm — and checks every output element
+bit-exact, not within a tolerance. Result: 256/256 row elements correct
+across 4 rows (one directed all-equal row plus 3 randomized wide-spread
+rows), run as part of `sim/run_tb.sh`'s regression suite on every change
+from here on. This document's algorithm and that RTL's implementation of
+it are now proven to agree, not merely observed to agree once.
 
 ## 5. Explicitly Out of Scope (This Document, and the RTL Skeleton It Gates)
 
@@ -256,3 +283,6 @@ overall accuracy.
 - `rtl/gcb_tensor_memory_engine.sv` (`gcb-wdm-transceiver`) — the
   `qam_result` / `qam_result_valid` stream this handoff taps directly,
   unchanged, per sec. 2.
+- `rtl/gcb_inline_vector_unit.sv` and `tb/tb_gcb_inline_vector_unit.sv`
+  (`gcb-wdm-transceiver`) — sec. 3's FSM and sec. 4's base-2 TLU math, and
+  the formal testbench proving them bit-exact (sec. 4.5).
