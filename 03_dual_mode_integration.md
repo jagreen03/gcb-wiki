@@ -7,6 +7,12 @@ Builds on the receiver split in
 [`02_receiver_architecture.md`](02_receiver_architecture.md) and the tiling
 constraint in `gcb-photonic-qam-v2/intent.md`.
 
+Source: the Grok architectural review. Its recommendation, in four points —
+the V1.0 electrical MAC stays the golden fallback; the V2.0 photonic QAM
+datapath sits beside it; a single CSR bit selects the active compute mode;
+the architecture unifies strictly on `K_MAX = 16` to stay inside the ≈ 30 dB
+SNR optical budget.
+
 > **Dual-Mode invariant. The production digital top-level instantiates the V1.0
 > electrical MAC and the V2.0 photonic QAM datapath side by side. A CSR field
 > selects exactly one active compute mode; transport, deskew, CSR, and the AXI
