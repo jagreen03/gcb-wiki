@@ -37,59 +37,93 @@ that matter architecturally, not just as software hygiene:
 
 ## 2. The Execution Opcode Bus Interface
 
-One fixed-format instruction word per operation, `ADDR_W = 40` bits per
-pointer (1 TiB addressable — comfortable headroom over the ~34 GiB full
-70B-model INT4 footprint doc 06 sec. 7 computed, without being tied to one
-specific GDDR7 subsystem's exact capacity):
+**Reconciled to the hardware wire format.** An earlier draft of this
+document specified a wider, 256-bit conceptual layout (40-bit pointers,
+three `DIM` fields, a `TILE_CFG` field) before any RTL existed against it.
+`rtl/gcb_opcode_dispatcher.sv` (`gcb-wdm-transceiver`) landed first, at a
+**128-bit** word instead — it aligns to a single AXI-Stream / PCIe payload
+beat with zero padding waste, a real hardware advantage the wider layout
+did not have. This section now matches that RTL exactly, field names
+included; the two consequences the narrower word has for what it *cannot*
+carry are called out explicitly below rather than smoothed over.
 
-| field | width | meaning |
-|---|---:|---|
-| `OPCODE` | 8 b | operation identifier — implies the target engine (sec. 1), room for 256 total, 3 defined here |
-| `SRC0_PTR` | 40 b | first operand pointer — meaning is opcode-defined (sec. 4) |
-| `SRC1_PTR` | 40 b | second operand pointer — meaning is opcode-defined |
-| `DST_PTR` | 40 b | output pointer — always where the *finished* result lands |
-| `DIM0`, `DIM1`, `DIM2` | 32 b each | shape parameters — `(M, K, N)` for a GEMM, `(VEC_LEN, -, -)` for a vector op (sec. 4) |
-| `TILE_CFG` | 32 b | opcode-defined tiling hint (e.g. `N_TILE` for `OP_GEMM`, unused for vector ops) |
+| field | bits | width | meaning |
+|---|---|---:|---|
+| `opcode` | `[127:120]` | 8 b | operation identifier — implies the target engine (sec. 1), room for 256 total, 3 defined (sec. 3) |
+| *(reserved)* | `[119:112]` | 8 b | padding; not decoded to any output (`gcb_opcode_dispatcher.sv`) |
+| `dst_ptr` | `[111:80]` | 32 b | output pointer — always where the *finished* result lands |
+| `b_ptr` | `[79:48]` | 32 b | second operand pointer — meaning is opcode-defined (sec. 4) |
+| `a_ptr` | `[47:16]` | 32 b | first operand pointer — meaning is opcode-defined |
+| `dim_k` | `[15:0]` | 16 b | the **one** shape parameter this word carries — see below |
 
 A pointer is a *logical* address (GDDR7 or Engine-Local SRAM — which one is
 an implementation/allocator concern, not an ISA concern) — see sec. 3.2 for
-the one case where `SRC0_PTR` deliberately does not mean "go read memory."
+the one case where `a_ptr` deliberately does not mean "go read memory."
+
+**Pointer range: 4 GiB per pointer, not 1 TiB.** `a_ptr`/`b_ptr`/`dst_ptr`
+each directly address 4 GiB ($2^{32}$ B) — generous for any *single*
+operand or output tensor at the scales this document has otherwise worked
+with (doc 05's 8–32 MiB reference matrices; doc 06's largest single weight
+matrix at 112 MiB), but not enough to address the full 70B model's ~34 GiB
+aggregate INT4 footprint (doc 06 sec. 7) as one flat space. **Not resolved
+here:** whether these are flat GDDR7 addresses (needing a segmented or
+windowed scheme above 4 GiB — not designed anywhere in this repo yet) or
+offsets into a per-tensor descriptor's own smaller allocation (in which
+case 4 GiB per tensor is ample headroom and the aggregate-footprint concern
+does not apply). A real open question this width surfaces, not a defect
+quietly designed around.
+
+**One dimension field, not three plus a tiling hint.** `OP_GEMM`'s full
+shape needs $M$, $K$, $N$, and (doc 05's own weight-stationary design)
+$N_{tile}$ — four numbers — and this word carries exactly one, `dim_k`
+(sec. 3.1 names it $K$, matching the field's own name — the reduction
+depth, the one dimension that is not already implicit in either operand
+tensor's own shape). **Not resolved here:** how $M$, $N$, and $N_{tile}$
+reach the Photonic Tensor Complex under this instruction format —
+candidates include per-tensor descriptors already carrying their own shape
+(so `a_ptr`/`b_ptr` imply $M$/$N$ without a dedicated field), a separate
+configuration instruction preceding the `OP_GEMM`, or a wider companion
+word — a later task, same as the pointer-range question above.
+`OP_SOFTMAX` and `OP_SCALE_DIAG` are unaffected: both need exactly one
+length ($VEC\_LEN$), which `dim_k` already carries with no information
+lost (sec. 3.2, 3.3).
 
 ## 3. Opcode Definitions
 
-### 3.1 `OP_GEMM` — routes to the Photonic Tensor Complex
+### 3.1 `OP_GEMM = 0x01` — routes to the Photonic Tensor Complex
 
 The direct instruction-level counterpart of `compiler/tiler.py`'s
-`PhotonicTiler` + `compiler/packer.py`'s `DMAPacker` output: `SRC0_PTR` /
-`SRC1_PTR` are the `A` (activations) and `B` (weights) matrices, `DST_PTR`
-is `Y`, `DIM0/DIM1/DIM2 = M/K/N`, `TILE_CFG = N_TILE`
+`PhotonicTiler` + `compiler/packer.py`'s `DMAPacker` output: `a_ptr` /
+`b_ptr` are the `A` (activations) and `B` (weights) matrices, `dst_ptr` is
+`Y`, `dim_k = K` (the reduction depth — sec. 2's callout on $M$/$N$/$N_{tile}$
+not yet having a field to travel in)
 ([`05_photonic_memory_dataflow.md`](05_photonic_memory_dataflow.md) sec. 5's
 design point). Dispatches to `gcb_tensor_memory_engine` via
 `mem_cfg_start` and the `mem_a_wr_*` / `mem_b_wr_*` DMA ports
 (`gcb-wdm-transceiver`); `qam_result` / `qam_result_valid` is the engine's
-own output stream, consumed per sec. 3.2 or drained to `DST_PTR`.
+own output stream, consumed per sec. 3.2 or drained to `dst_ptr`.
 
-### 3.2 `OP_SOFTMAX` — routes to the inline Vortex Vector Unit
+### 3.2 `OP_SOFTMAX = 0x02` — routes to the inline Vortex Vector Unit
 
 Maps onto `gcb_inline_vector_unit.sv`'s FSM
 ([`07_inline_vector_softmax.md`](07_inline_vector_softmax.md) sec. 3):
-`SRC0_PTR` is the row to normalize, `DST_PTR` the finished activations,
-`DIM0 = VEC_LEN`; `SRC1_PTR` is unused (Softmax is unary).
+`a_ptr` is the row to normalize, `dst_ptr` the finished activations,
+`dim_k = VEC_LEN`; `b_ptr` is unused (Softmax is unary).
 
-`SRC0_PTR` is deliberately **not always a memory read**. Doc 07's entire
+`a_ptr` is deliberately **not always a memory read**. Doc 07's entire
 point is that an `OP_GEMM` immediately followed by an `OP_SOFTMAX` over that
 same GEMM's output must **not** round-trip GDDR7 (sec. 1's quantified 4.295
 GB / 2.68 s tax). The dispatcher recognizes this exact adjacency —
-`OP_SOFTMAX.SRC0_PTR == (the immediately preceding OP_GEMM's) DST_PTR` — and
+`OP_SOFTMAX.a_ptr == (the immediately preceding OP_GEMM's) dst_ptr` — and
 wires `qam_result` / `qam_result_valid` straight into
 `gcb_inline_vector_unit`'s `core_result` / `core_result_valid` ports (doc 07
-sec. 2's staging SRAM), never touching GDDR7 for that value. `SRC0_PTR`
+sec. 2's staging SRAM), never touching GDDR7 for that value. `a_ptr`
 still names the *logical* value (needed when the two opcodes are **not**
 adjacent — a normalization run on data that genuinely does live in GDDR7 is
 a legal, if slower, program), but the fused case is what a compiler
 targeting this ISA should always try to emit for attention Softmax.
 
-### 3.3 `OP_SCALE_DIAG` — element-wise scale, executed as a matmul, on the Photonic array
+### 3.3 `OP_SCALE_DIAG = 0x03` — element-wise scale, executed as a matmul, on the Photonic array
 
 **The identity.** Element-wise scaling of a length-$N$ vector $v$ by a
 length-$N$ scale $s$ — $y_i = v_i \cdot s_i$ — is exactly matrix-vector
@@ -100,10 +134,10 @@ $$y = \mathrm{diag}(s) \cdot v, \qquad \mathrm{diag}(s)_{ij} = \begin{cases} s_i
 This is a real mathematical equivalence, not a trick played on the ISA:
 $\mathrm{diag}(s)$ is **never materialized** in memory (that would cost
 $O(N^2)$ storage for $O(N)$ information — exactly the failure mode this
-opcode avoids). `SRC0_PTR` / `SRC1_PTR` are $v$ and $s$, two length-$N$
+opcode avoids). `a_ptr` / `b_ptr` are $v$ and $s$, two length-$N$
 vectors — the *identical* memory footprint a native element-wise-multiply
-instruction would need. What changes is which physical hardware executes
-it and how.
+instruction would need. `dim_k = VEC\_LEN` (sec. 2). What changes is which
+physical hardware executes it and how.
 
 **Mapping onto the existing 16x16 PE grid — no new distribution RTL.**
 `gcb_tensor_broadcast_fabric.sv` wires core $(r,c)$ (flat index
@@ -156,14 +190,14 @@ operation onto this array that is dimensionally sound at all.
 
 ## 4. Standard Operand Footprint
 
-Every opcode uses the identical three-pointer, three-dimension shape (sec.
+Every opcode uses the identical three-pointer, one-dimension shape (sec.
 2); only the *meaning* of each field is opcode-defined:
 
-| opcode | `SRC0_PTR` | `SRC1_PTR` | `DST_PTR` | `DIM0/DIM1/DIM2` | `TILE_CFG` |
-|---|---|---|---|---|---|
-| `OP_GEMM` | $A$ (activations) | $B$ (weights) | $Y$ | $M/K/N$ | $N_{tile}$ |
-| `OP_SOFTMAX` | row to normalize (sec. 3.2: may be fused, not a real read) | unused | normalized row | $VEC\_LEN/{-}/{-}$ | unused |
-| `OP_SCALE_DIAG` | $v$ | $s$ (the diagonal) | $y$ | $VEC\_LEN/{-}/{-}$ | unused |
+| opcode | `a_ptr` | `b_ptr` | `dst_ptr` | `dim_k` |
+|---|---|---|---|---|
+| `OP_GEMM` | $A$ (activations) | $B$ (weights) | $Y$ | $K$ (sec. 2: $M$/$N$/$N_{tile}$ have no field yet) |
+| `OP_SOFTMAX` | row to normalize (sec. 3.2: may be fused, not a real read) | unused | normalized row | $VEC\_LEN$ |
+| `OP_SCALE_DIAG` | $v$ | $s$ (the diagonal) | $y$ | $VEC\_LEN$ |
 
 ## 5. From `HybridPartitioner` Tags to Opcodes
 
@@ -193,6 +227,13 @@ is the concrete mechanism that would carry it out.
 
 ## 6. Explicitly Out of Scope
 
+- **Addressing above 4 GiB per pointer** (sec. 2) — whether `a_ptr` /
+  `b_ptr` / `dst_ptr` are flat GDDR7 addresses needing a segmented/windowed
+  scheme, or offsets into smaller per-tensor allocations that make the
+  question moot, is not decided anywhere in this repo yet.
+- **Carrying `OP_GEMM`'s $M$, $N$, and $N_{tile}$** (sec. 2) — `dim_k`
+  covers $K$ only; how the other three shape parameters reach the
+  Photonic Tensor Complex under this 128-bit format is not decided.
 - Per-core-unique operand delivery for `OP_SCALE_DIAG` (sec. 3.3's "future"
   row, 16 beats instead of 256 for $N{=}4096$) — needs new SRAM-controller
   addressing/muxing, not just a new driving pattern over existing wiring;
@@ -200,9 +241,15 @@ is the concrete mechanism that would carry it out.
 - Updating `compiler/partitioner.py` to actually emit `OP_SCALE_DIAG` for
   RMSNorm-shaped `operator.mul` nodes (sec. 5) — the routing rule is
   identified, not implemented.
-- A hardware instruction decoder/dispatcher RTL module — this document
-  defines the bus format and per-opcode semantics only; nothing here
-  claims an `gcb_opcode_dispatcher.sv` exists yet.
+- Actually routing a decoded opcode to an engine.
+  `rtl/gcb_opcode_dispatcher.sv` (`gcb-wdm-transceiver`) exists and is
+  formally verified (sec. 3's field layout is that module exactly, not a
+  forward-looking description of one) — but it only exposes
+  `decoded_opcode` / `ptr_a` / `ptr_b` / `ptr_dst` / `dim_k` as discrete
+  signals (sec. 1's Dependency Inversion point: decode and route are
+  separate concerns). Nothing yet reads `decoded_opcode` and actually
+  steers a transaction at `gcb_tensor_memory_engine` or
+  `gcb_inline_vector_unit`.
 - Any opcode beyond the three defined here (control flow, reductions,
   attention's own $QK^T$/$\mathrm{Attn}{\times}V$ dynamic matmuls, which
   stay on Vortex per doc 06 sec. 2 but have no dedicated opcode yet).
@@ -212,7 +259,7 @@ is the concrete mechanism that would carry it out.
 - [`06_70B_transformer_workload_trace.md`](06_70B_transformer_workload_trace.md)
   — the `PHOTONIC`/`VORTEX` partitioning doctrine this bus routes against.
 - [`07_inline_vector_softmax.md`](07_inline_vector_softmax.md) — the
-  inline handoff `OP_SOFTMAX`'s fused-`SRC0_PTR` case (sec. 3.2) implements
+  inline handoff `OP_SOFTMAX`'s fused-`a_ptr` case (sec. 3.2) implements
   at the ISA level.
 - `compiler/partitioner.py`, `compiler/tiler.py`, `compiler/packer.py`
   (`gcb-python-orchestrator`) — `OP_GEMM`'s direct software counterpart
@@ -220,3 +267,9 @@ is the concrete mechanism that would carry it out.
 - `rtl/gcb_tensor_broadcast_fabric.sv`, `rtl/gcb_qam_datapath_top.sv`
   (`gcb-wdm-transceiver`) — the row/column broadcast wiring and `k_len`
   masking `OP_SCALE_DIAG` sec. 3.3 reuses unchanged.
+- `rtl/gcb_opcode_dispatcher.sv` and `tb/tb_opcode_dispatcher.sv`
+  (`gcb-wdm-transceiver`) — sec. 2's bus layout is that module's actual,
+  formally-verified field decode, not a conceptual description; renamed
+  from an earlier draft's name that collided with
+  [`04_ai_protocols_and_blue_wording.md`](04_ai_protocols_and_blue_wording.md)'s
+  PGB Triad boundary invariant.
