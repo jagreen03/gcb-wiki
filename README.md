@@ -32,6 +32,7 @@ digestible and avoids a single spaghetti graph.
 | 02 | [`02_receiver_architecture.md`](02_receiver_architecture.md) | L1 | Phase I vs Phase II receiver datapath; the no-routed-analog-voltage invariant |
 | 03 | [`03_dual_mode_integration.md`](03_dual_mode_integration.md) | L1 | V1.0 electrical / V2.0 photonic dual-mode top-level; CSR mode select; K_MAX = 16 unification |
 | 04 | [`04_ai_protocols_and_blue_wording.md`](04_ai_protocols_and_blue_wording.md) | — | Hard definitions: PGB Triad & Cyclopter (prompt-layer protocols), Blue Wording (data-format spec) — none are GCB hardware |
+| 05 | [`05_photonic_memory_dataflow.md`](05_photonic_memory_dataflow.md) | L1 | Quantitative GDDR7 bandwidth (9 GB/s) and Engine-Local SRAM sizing (4.5 MB) for the 256-core Photonic Tensor Complex on a 4096x4096x4096 INT4 matmul |
 
 ## Conventions
 
