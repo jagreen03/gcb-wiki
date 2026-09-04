@@ -31,6 +31,7 @@ digestible and avoids a single spaghetti graph.
 | 01 | [`01_streaming_sequence.md`](01_streaming_sequence.md) | L1 | Compute → optical streaming boundary, one reduction, end to end |
 | 02 | [`02_receiver_architecture.md`](02_receiver_architecture.md) | L1 | Phase I vs Phase II receiver datapath; the no-routed-analog-voltage invariant |
 | 03 | [`03_dual_mode_integration.md`](03_dual_mode_integration.md) | L1 | V1.0 electrical / V2.0 photonic dual-mode top-level; CSR mode select; K_MAX = 16 unification |
+| 04 | [`04_ai_protocols_and_blue_wording.md`](04_ai_protocols_and_blue_wording.md) | — | Hard definitions: PGB Triad & Cyclopter (prompt-layer protocols), Blue Wording (data-format spec) — none are GCB hardware |
 
 ## Conventions
 
