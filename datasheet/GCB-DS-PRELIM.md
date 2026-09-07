@@ -8,6 +8,13 @@
 **Document status:** Phase B preliminary. Numbers are simulation / model
 outputs, not silicon.
 
+**Evidence-doc shorthand** (paths under `gcb-papers/data/readout/`):
+`SR2` = `spice/SPICE_RESULTS_V2.md` · `SR3` = `spice/SPICE_RESULTS_V3.md`
+(§0–§4 = first pass, §5–§11 = V3.1) · `RTL_REPORT.md` = `rtl/RTL_REPORT.md` ·
+`comparator_noise.json` = `spice/comparator_noise.json`. `SR1`
+(`spice/SPICE_RESULTS.md`, the rejected V1 rising-ramp NO-GO) is **not** a
+source for any value below.
+
 ---
 
 ## 0. Overview & Features
@@ -39,7 +46,7 @@ Features:
   `gcb-papers/data/readout/rtl/RTL_REPORT.md` §1.
 - MMIO control surface `SS_READOUT` 0xB0–0xC0 — `gcb-spec/registers.yaml`.
 - Modelled readout energy **≈ 0.55 fJ/MAC** [D] vs a **< 0.02 pJ/MAC** [T]
-  digital-accumulate baseline (`SPICE_RESULTS_V3.md` §3, `RTL_REPORT.md` §4).
+  digital-accumulate baseline (`SR3` §2, `RTL_REPORT.md` §4).
 
 **Verdict:** CONDITIONAL GO — the comparator-noise figure rests on a BSIM4
 surrogate (±16 %); a commercial transient-noise histogram lifts it to GO
@@ -86,46 +93,52 @@ All entries **TBD** — no package, no silicon, no reliability data.
 > **PRELIMINARY CONCEPT — NO SILICON EXISTS — all values modeled unless marked.**
 
 Readout comparator design point: `I_tail` = 30 µA/stage [A], `C_L` = 0.8 pF
-[A], `F_chop` = 20 MHz [A], ASAP7 7.5T, TT/27 °C unless noted. Source:
-`gcb-papers/data/readout/spice/SPICE_RESULTS_V3.md` §3, §7;
-`.../comparator_noise.json`.
+[A], `F_chop` = 20 MHz [A], 2-stage chopped/AZ preamp + StrongARM, ASAP7 7.5T,
+TT/27 °C unless noted.
+
+**Two noise numbers are in play.** The **analytic roll-up** (γ = 1.0,
+`comparator_noise.json`) gives a 30 µA total of **46 µV**. The **BSIM4 `.noise`
+result** (γ_eff ≈ 1.4, `SPICE_RESULTS_V3.md` §7) gives **53 µV** — this is the
+figure the CONDITIONAL GO and the ±16 % surrogate band ride on; the roll-up is
+the lower-bound cross-check. Rows below quote the **BSIM4 `.noise`** values.
 
 | Parameter | Value | Tag | Data path |
 |---|---|---|---|
-| Photocurrent, RMS | 0.74 µA | [T] | `ss_readout_mc.py` `I_pd_rms` |
-| Photocurrent, full-scale (crest 6) | 4.45 µA | [T] | `ss_readout_mc.py` `crest` |
-| Integrated full-scale charge `Q_FS` | 1.137 pC | [D] | SR2 header |
-| Integrator swing `V_FS` (on 2.0 pF) | 568 mV | [D] | SR2 header |
-| Ramp slope (9 PVT corners) | 4.18–4.22 mV/ns | [M] | `ramp_inl/ramp_inl_meta.json` `slope_mV_ns` |
-| Ramp INL, raw (best-fit line) | 0.04–0.11 % FS RMS | [M] | SR2 §1b; `ramp_inl_*.csv` |
-| Ramp INL, after 3-point cal | ≤ 0.27 % FS RMS | [D] | SR2 §1b |
-| Preamp per-stage gain (measured) | 5.3–8.9 | [M] | SR3 §5c |
-| Preamp total gain `G_tot` (2 stages) | ≈ 28–79 (design pt ≈ 50) | [D] | SR3 §5c; `comparator_noise.json` `Gtot` |
-| Comparator σ_thermal (over NBW) | 47.7 µV | [D] | `comparator_noise.json` `v_thermal_stage1_uV`; SR3 §7 |
-| BSIM4 excess-noise factor γ_eff | 1.4 | [P] | SR3 §7 (BSIM4 `.noise`) |
-| Comparator σ_1/f, auto-zero only | ≈ 43 µV | [D],[P] | SR3 §7; `K_Fn` proxy 5e-11 V²·µm² [P] |
-| Comparator σ_1/f, + 20 MHz chopper | 15.6 µV | [D],[P] | SR3 §7 |
-| StrongARM latch, input-referred / `G_tot` | ≈ 16 µV | [A] | SR3 §7 |
-| **Total input-referred comparator noise** | **53 µV** | **[D]** | SR3 §7; `comparator_noise.json` `v_total_uV` |
+| Photocurrent, RMS | 0.74 µA | [T] | `gcb-spec/models/readout/ss_readout_mc.py` `I_pd_rms` |
+| Photocurrent, full-scale (crest 6) | 4.45 µA | [T] | `ss_readout_mc.py` `I_pd_rms · crest` |
+| Integrated full-scale charge `Q_FS` | 1.137 pC | [D] | SR2 header line |
+| Integrator swing `V_FS` (on 2.0 pF) | 568 mV | [D] | SR2 header line |
+| Ramp slope (9 PVT corners) | 4.18–4.22 mV/ns | [M] | `data/readout/ramp_inl/ramp_inl_meta.json` `slope_mV_ns` |
+| Ramp INL, raw (best-fit line, discharge ramp) | 0.04–0.11 % FS RMS | [M] | SR2 §1b; `data/readout/ramp_inl/ramp_inl_*.csv` |
+| Preamp per-stage gain (measured) | 5.3–8.9 | [M] | SR3 §1 (per-stage op-point table); §5c |
+| Preamp total gain `G_tot` (two stages, `G1²`) | 28–79 (design pt 50.4) | [D] | `comparator_noise.json` `rows[*].Gtot`; SR3 §5c |
+| Comparator σ_thermal (BSIM4 `.noise`, over NBW) | 47.7 µV | [D] | SR3 §7 (30 µA row) |
+| BSIM4 excess-noise factor γ_eff | ≈ 1.4 | [P] | SR3 §7 (BSIM4 `.noise` fit) |
+| Comparator σ_1/f, raw (BSIM4 `.noise`, 1 kHz–1 GHz) | 54.4 µV | [D],[P] | SR3 §7 (30 µA row); `K_Fn` proxy [P] |
+| Comparator σ_1/f, after 20 MHz chopper | 15.6 µV | [D],[P] | SR3 §7 (30 µA row) |
+| — analytic roll-up, auto-zero only (cross-check) | ≈ 43 µV | [D],[P] | `comparator_noise.json`; SR3 §7 |
+| StrongARM latch, input-referred / `G_tot` | ≈ 16 µV | [A] | SR3 §7 (assumed 0.8 mV latch ÷ `G_tot`) |
+| **Total input-referred comparator noise (BSIM4 `.noise`)** | **53 µV** | **[D]** | SR3 §7 (30 µA row); §9 |
+| — analytic roll-up total (cross-check) | 45.8 µV | [D] | `comparator_noise.json` `rows[*].v_total_uV` |
 | Comparator-noise gate | ≤ 55 µV | [T] | SR3 §9 |
 | Surrogate-model uncertainty | ±16 % (44.5–61.5 µV) | [P] | SR3 §9 |
-| 3σ input offset `V_os` (post OOS auto-zero) | 3.2 mV | [D] | SR3 §3; `A_VT` proxy 2.0 mV·µm [P] |
+| 3σ input offset `V_os` (post OOS auto-zero) | 3.2 mV | [D] | `comparator_noise.json` `Vos_resid_3sig_mV`; SR3 §3 |
 | `V_os` gate | ≤ 5 mV | [T] | SR3 §9 |
-| Pelgrom coefficient `A_VT` | 2.0 mV·µm | [P] | SR3 §7 |
-| Flicker coefficient `K_Fn` | 5e-11 V²·µm² | [P] | SR3 §7 |
-| Readout SNDR, worst-corner p05 (at 53 µV) | 56.72 dB | [D] | SR3 §8; `mc_v2/*_spiceN53_c2.json` |
-| SNDR target | ≥ 56 dB (comfortable); ≥ 53 dB (knee) | [T] | `enob_tolerance.py` result; SR3 §9 |
-| `v_comp_noise` at which p05 → 56 dB | ≈ 72 µV | [D] | SR3 §10 (extrapolated); `mc_v2/*_nsweep*_c2.json` |
-| Comparator energy, gated 20 ns decision | 0.51 fJ/MAC | [D] | SR3 §3 |
-| Comparator energy, ungated (171 ns) | ≈ 1.7 fJ/MAC | [D] | SR3 §3 |
-| Digital back-end energy | 0.039 fJ/MAC (0.056 pess.) | [D] | `RTL_REPORT.md` §4; `sim/ss_energy.py` |
-| **Total readout energy** | **≈ 0.55 fJ/MAC** | **[D]** | SR3 §3 + RTL §4 |
+| Pelgrom coefficient `A_VT` | 2.0 mV·µm | [P] | SR3 §0 ("Assumed published-FinFET proxies") |
+| Flicker coefficient `K_Fn` | 5e-11 V²·µm² | [P] | SR3 §0 |
+| Readout SNDR, worst-corner p05 (at 53 µV) | 56.72 dB | [D] | SR3 §8; `data/readout/spice/mc_v2/*_spiceN53_c2.json` |
+| SNDR target | ≥ 56 dB (comfortable); ≥ 53 dB (collapse knee) | [T] | `gcb-spec/docs/adr/ADR-005-*.md` (context); SR3 §9 |
+| `v_comp_noise` at which readout p05 → 56 dB | ≈ 72 µV (extrapolated) | [D] | SR3 §10; `data/readout/spice/mc_v2/*_nsweep*_c2.json` |
+| Comparator energy, gated 20 ns decision | 0.51 fJ/MAC | [D] | `comparator_noise.json` `E_fJ_per_MAC` (30 µA); SR3 §2 |
+| Comparator energy, ungated (171 ns) | ≈ 1.7 fJ/MAC | [D] | SR3 §2 |
+| Digital back-end energy | 0.039 fJ/MAC (0.056 pess.) | [D] | `RTL_REPORT.md` §4; `gcb-rtl/sim/ss_energy.py` |
+| **Total readout energy** | **≈ 0.55 fJ/MAC** | **[D]** | SR3 §2 + `RTL_REPORT.md` §4 |
 | Energy gate | ≤ 0.6 fJ/MAC | [T] | SR3 §9 |
 | ASAP7 cap: flop / gate / Gray-dist | 0.80 / 0.30 / 6.0 fF | [P] | `RTL_REPORT.md` §4 |
 
-Lower-noise operating points exist (`I_tail` = 15 µA → ≈ 39 µV [D]) but are
-**decision-time-disqualified** (preamp τ ≈ 40 ns > the ≈ 30 ns ramp window,
-SR3 §5b).
+Lower-noise operating points exist (`I_tail` = 15 µA → ≈ 39 µV [D], SR3 §7) but
+are **decision-time-disqualified**: preamp τ ≈ 40 ns > the ≈ 30 ns ramp window,
+so the crossing cannot be resolved in time (SR3 §5b).
 
 ---
 
@@ -159,7 +172,7 @@ hand-edit between the markers.
 
 <!-- REGEN:BEGIN regmap -->
 
-_Generated by `gcb-spec/regen.py --target md` from `registers.yaml` map_version **0.5.2** &mdash; 40 registers, address window 0x00&ndash;0xC0, unmapped read 0xDEADBEEF._
+_Generated by `gcb-spec/regen.py --target md` from `registers.yaml` map_version **0.5.2** — 40 registers, address window 0x00–0xC0, unmapped read 0xDEADBEEF._
 
 | Offset | Register | Domain | Access | Fields (bit range) |
 |---|---|---|---|---|
@@ -178,14 +191,14 @@ _Generated by `gcb-spec/regen.py --target md` from `registers.yaml` map_version 
 | 0x30 | `CELL_COUNT_SYNC` | training | ro/rw | `CELL_COUNT`[9:0], `CELLS_READY`[19:10], `ALL_CELLS_READY`[20], `GRAD_REDUCE_DONE`[21] |
 | 0x34 | `GRAD_REDUCE_CTRL` | training | rw/w1p | `GRAD_REDUCE_EN`[0], `GRAD_REDUCE_FIRE`[1], `AUTO_GRAD_REDUCE`[2], `GRAD_SCALE`[31:8] |
 | 0x38 | `SPI_CFG` | training | rw | `N_SPI_BUSES`[1:0], `SPI_CLK_DIV`[23:8] |
-| 0x40 | `THERMAL_TARGET` | thermal | &mdash; | *not implemented* |
-| 0x44 | `THERMISTOR_TELEM0` | thermal | &mdash; | *not implemented* |
-| 0x48 | `THERMISTOR_TELEM1` | thermal | &mdash; | *not implemented* |
-| 0x4C | `TEC_CTRL_STATUS` | thermal | &mdash; | *not implemented* |
-| 0x50 | `THERMAL_GUARD_RAIL` | thermal | &mdash; | *not implemented* |
-| 0x54 | `THERMAL_LOG` | thermal | &mdash; | *not implemented* |
-| 0x58 | `THERMAL_IRQ_CTRL` | thermal | &mdash; | *not implemented* |
-| 0x5C | `TEC_PID_COEFF` | thermal | &mdash; | *not implemented* |
+| 0x40 | `THERMAL_TARGET` | thermal | — | *not implemented* |
+| 0x44 | `THERMISTOR_TELEM0` | thermal | — | *not implemented* |
+| 0x48 | `THERMISTOR_TELEM1` | thermal | — | *not implemented* |
+| 0x4C | `TEC_CTRL_STATUS` | thermal | — | *not implemented* |
+| 0x50 | `THERMAL_GUARD_RAIL` | thermal | — | *not implemented* |
+| 0x54 | `THERMAL_LOG` | thermal | — | *not implemented* |
+| 0x58 | `THERMAL_IRQ_CTRL` | thermal | — | *not implemented* |
+| 0x5C | `TEC_PID_COEFF` | thermal | — | *not implemented* |
 | 0x60 | `EXEC_CTRL` | isa | ro/rw | `EXEC_START`[0], `EXEC_STOP`[1], `EXEC_RESET`[2], `EXEC_STEP`[3], `EXEC_RUNNING`[8], `EXEC_DONE`[9], `EXEC_ERROR`[10], `EXEC_PC`[23:12], `EXEC_OPCODE`[31:24] |
 | 0x64 | `BRAM_WR_ADDR` | isa | rw | `BRAM_WR_ADDR`[11:0] |
 | 0x68 | `BRAM_WR_DATA_LO` | isa | rw | `BRAM_WR_DATA_LO`[31:0] |
@@ -234,4 +247,5 @@ defined.** Every dimension, voltage tolerance and current is **TBD**.
 
 | Rev | Date | Change |
 |---|---|---|
-| PRELIM-A | 2026-09-07 | Phase B initial issue. Overview, block-diagram pointer, absolute-max stub (all TBD), electrical characteristics from the SPICE roll-up (`SPICE_RESULTS_V3.md`), timing, `regen.py`-injected register map, concept package pointer. Verdict CONDITIONAL GO. |
+| PRELIM-A | 2026-09-07 | Phase B initial issue. Overview, block-diagram pointer, absolute-max stub (all TBD), electrical characteristics from the SPICE roll-up (`SR3`), timing, `regen.py`-injected register map, concept package pointer. Verdict CONDITIONAL GO. |
+| PRELIM-A rev.1 | 2026-09-07 | Rendering review: (a) added the `SR1/SR2/SR3` shorthand legend; (b) split the comparator-noise rows into the BSIM4 `.noise` figures (47.7 / 54.4 / 15.6 / **53 µV**, the CONDITIONAL-GO basis) and the analytic roll-up cross-check (`comparator_noise.json`, γ = 1.0: σ_thermal 40.8, σ_1/f AZ-only ≈ 43 / post-chop 12.1, latch/`G_tot` 15.9, **total 45.8 µV**) — earlier rows conflated the two and mis-cited `comparator_noise.json` for the 53 µV total; (c) removed a row that quoted the rejected V1 rising-ramp post-cal INL (`SR1`) as if it were the V2 discharge ramp; (d) re-pointed the SNDR-target row from an uncommitted script to `ADR-005`; (e) `regen.py emit_md` now writes literal en/em-dashes instead of HTML entities. No value that survived review changed. |
