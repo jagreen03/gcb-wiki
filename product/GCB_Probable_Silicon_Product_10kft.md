@@ -5,6 +5,16 @@ date: "2026-09-07"
 geometry: margin=0.7in
 ---
 
+> # ⚠️ VISION DOCUMENT — NOT A SPECIFICATION
+> This is a **10,000-foot architectural inference** about what the current GCB
+> work *might* become at silicon scale. It is speculative and forward-looking.
+> **No silicon exists.** Numbers here are guesses, not modelled, measured, or
+> committed. Do **not** cite this as a datasheet, a spec, or evidence that any
+> GCB hardware exists. The authoritative documents are
+> `gcb-spec/architecture.md`, `gcb-spec/registers.yaml`,
+> `gcb-wiki/DECISION_LEDGER.md`, `gcb-wiki/datasheet/GCB-DS-PRELIM.md`, and the
+> ADRs in `gcb-spec/docs/adr/`.
+
 # GCB — Probable Silicon Product
 
 ## 10,000-Foot Architecture View

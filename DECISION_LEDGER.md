@@ -1,7 +1,17 @@
 # GCB Decision Ledger
 
-Every architectural decision with a recorded state. One table, newest work last.
+Every architectural decision with a recorded state. One table.
+
+**Status values:** `Accepted` · `Rejected` · `Superseded` (a better option
+replaced it) · `Retired` (branch closed, no successor) · `Open`.
 `[Unfiled]` = no evidence document exists yet.
+
+**Dates** are the commit date of the governing evidence, or — for pre-SPICE
+architectural audits that were never committed as standalone docs (the ICO /
+ΔΣ / ADC-energy-floor work) — the session date on which the call was made
+(2026-09-06, approximate). ADR-001 predates this work (2026-08-28); the bench
+parameter sheet is 2026-09-02; the readout SPICE / RTL / ADR-005 work all
+landed 2026-09-07.
 
 Evidence-doc shorthand:
 - **SR1 / SR2 / SR3** = `gcb-papers/data/readout/spice/SPICE_RESULTS{,_V2,_V3}.md`
@@ -26,22 +36,22 @@ Evidence-doc shorthand:
 | `tdc.counter` | Accepted | DD-001; RTL §3 | Carry-select 12-bit Gray counter — ~112 ps path at SS/125 °C, ~55 ps slack. | 2026-09-07 |
 | `tdc.clock` | Accepted | RTL §3c; DD-001 | CML for the 4-phase 6 GHz clock generation + trunk; static CMOS has unacceptable skew and dynamic power at 6 GHz. | 2026-09-07 |
 | `tdc.logic` | Accepted | RTL §3c | Counter, phase latches, capture and calibration stay static CMOS — one CML island only. | 2026-09-07 |
-| `analog.cascade.stage-reset` | Accepted | ADR-001 | Reset the analog noise floor at every cascade stage boundary — converts a physics wall into reserved headroom bits. | 2026-09-04 |
+| `analog.cascade.stage-reset` | Accepted | ADR-001 | Reset the analog noise floor at every cascade stage boundary — converts a physics wall into reserved headroom bits. | 2026-08-28 |
 | `toolchain.spice` | Accepted | SPENV | Self-built ngspice-44 `--enable-osdi` + OpenVAF BSIM-CMG 111 + ASAP7 r1p7, no root. | 2026-09-07 |
-| `readout.encode.ico.tail-injection` | Superseded | ADR-005 (context); SR3 | Encodes charge in the transistor `f(I)` — a PVT-dependent, 1/f-upconverting curve; linearity ↔ phase-noise operating points contradict with no PVT margin. | 2026-09-06 |
+| `readout.encode.ico.tail-injection` | Superseded | ADR-005 (context); SR3 | Unprovable; encodes charge in f(I) requiring impossible PVT calibration. | 2026-09-06 |
 | `readout.encode.ico.c-node` | Rejected | [Unfiled] | 0.5 fF oscillator node — `I_PD,FS/I_bias` modulation ratio too high; INL uncontrollable across PVT. | 2026-09-06 |
-| `readout.convert.sigma-delta` | Superseded | ADR-005 | Charge-balancing ΔΣ retired — no free oversampling (OSR = 1 during integration); every sub-block re-introduces the cost it claims to avoid. | 2026-09-07 |
+| `readout.convert.sigma-delta` | Retired | ADR-005 | Audit-only branch; "no free oversampling" charge-domain analysis enabled the fast pivot. | 2026-09-07 |
 | `readout.convert.tia-adc` | Rejected | SR1; ADR-005 | Per-channel TIA + multi-bit ADC — ADC energy floor exceeds the 0.02 pJ/MAC digital baseline at any buildable reduction depth. | 2026-09-06 |
 | `readout.tdc.resolution.10b` | Rejected | SR2; ANL | 10-bit quantization fails on the crest factor; 12-bit + 4-phase required. | 2026-09-06 |
-| `readout.comparator.cds` | Rejected | SR1 §4; ANL | Correlated double sampling costs −1.7 dB SNDR — doubles the dominant comparator-thermal term (×√2) to cancel a smaller kT/C. | 2026-09-06 |
+| `readout.comparator.cds` | Rejected | SR1 §4; ANL | Loses in this specific architecture because comparator dominates kT/C and 1/f. | 2026-09-06 |
 | `readout.chopper.pd` | Rejected | SR3 | 300 MHz photodiode chopper is a cyclostationary mixer on the photocurrent; replaced by a MHz-range CIS chopper on the preamp. | 2026-09-06 |
 | `readout.ramp.polarity.rising` | Rejected | SR2 §1c; SR1 | Rising PMOS ramp — a 0.72 V ramp top from a 0.8 V rail leaves < 80 mV, cannot be cascoded. | 2026-09-07 |
-| `readout.ramp.dac` | Rejected | SR1 | DAC (segmented) ramp — current-on-cap INL ~1 % after 4-point cal → 42–49 dB SNDR ceiling; the ≤ 4-point-cal "pass" was a scoring artifact of a parabola-only INL model. | 2026-09-07 |
+| `readout.ramp.dac` | Rejected | SR1 | Scoring artifact retracted (42 dB vs 58 dB) based on actual signal distribution. | 2026-09-07 |
 | `readout.integrator.cap.1pF` | Rejected | SR1 §3; SR2 §6.2 | 1 pF `C_int` — `V_FS` too large, the 1.25×FS ramp collides the 0.8 V rail. | 2026-09-07 |
 | `tdc.counter.ripple` | Rejected | DD-001; RTL §3 | Ripple-carry 12-bit Gray counter ~195 ps > 166.7 ps at SS/125 °C; a TT-only timing run hides the failure. | 2026-09-07 |
 | `readout.comparator.tail.15uA` | Rejected | SR3 §5b | 15 µA comparator tail — preamp τ ≈ 40 ns > the ~30 ns ramp window; cannot resolve the crossing in time. | 2026-09-07 |
 | `toolchain.spice.xyce` | Rejected | XYCE; SR3 §6 | Xyce via conda-forge Trilinos — Trilinos build lacks NOX/LOCA and EpetraExt/BTF; a from-source Trilinos build was out of scope. | 2026-09-07 |
 | `readout.comparator.noise.spectre-histogram` | Open | SR3 §9 | A commercial (Spectre, native BSIM-CMG) transient-noise histogram to close the ±16 % surrogate uncertainty on the 53 µV number — lifts CONDITIONAL GO → GO. | 2026-09-07 |
 | `readout.comparator.preamp.gmc-fallback` | Open | SR3 §11 | g_m–C integrating preamp — documented, unbuilt; decouples gain from the 0.8 V load headroom. Build only if the Spectre histogram breaches 55 µV. | 2026-09-07 |
-| `optical.cell.combiner-loss` | Open | BENCH | Combiner / insertion loss regime of the discrete-component 8-input reduction cell — to be measured on the bench, not modelled. | 2026-09-04 |
-| `optical.cell.fanin` | Open | [Unfiled] | First reduction cell fan-in: 4:1 vs 8:1 not yet chosen. | 2026-09-04 |
+| `optical.cell.combiner-loss` | Open | BENCH | Combiner / insertion loss regime of the discrete-component 8-input reduction cell — to be measured on the bench, not modelled. | 2026-09-02 |
+| `optical.cell.fanin` | Open | [Unfiled] | First reduction cell fan-in: 4:1 vs 8:1 not yet chosen. | 2026-09-02 |
