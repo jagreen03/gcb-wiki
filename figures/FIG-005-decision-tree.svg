@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">
+<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/></marker><marker id="arwg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9aa4ad"/></marker></defs>
+<rect x="0" y="0" width="1400" height="900" fill="#ffffff"/>
+<text x="20" y="30" font-size="17" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">FIG-005  Readout architecture decision tree  (ICO → Single-Slope)</text>
+<text x="20" y="50" font-size="11" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Logical elimination, not a chronology. Every node is a row of DECISION_LEDGER.md.</text>
+<rect x="480" y="70" width="400" height="34" rx="7" fill="#eef2f5" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="680.0" y="87" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">digitise the optical group output &lt; 0.02 pJ/MAC</text>
+<text x="488" y="104" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"></text>
+<line x1="680" y1="104" x2="680" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="230" y1="130" x2="1130" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="230" y1="130" x2="230" y2="150" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="680" y1="130" x2="680" y2="150" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="1130" y1="130" x2="1130" y2="150" stroke="#1a1a1a" stroke-width="1.4"/>
+<rect x="120" y="150" width="220" height="40" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="230.0" y="167" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">per-channel TIA + multi-bit ADC</text>
+<text x="128" y="184" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"></text>
+<rect x="560" y="150" width="240" height="40" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="680.0" y="167" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">oscillator / phase accumulation</text>
+<text x="568" y="184" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"></text>
+<rect x="1000" y="150" width="260" height="40" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1130.0" y="167" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">direct comparison vs a shared ramp</text>
+<text x="1008" y="184" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"></text>
+<line x1="230" y1="190" x2="230" y2="216" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="110" y="220" width="240" height="56" rx="7" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1.4"/>
+<text x="230.0" y="237" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  per-channel TIA + multi-bit ADC</text>
+<text x="118" y="254" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="118" dy="0">ADC energy floor exceeds 0.02 pJ/MAC</tspan><tspan x="118" dy="10.5">at any buildable reduction depth</tspan></text>
+<line x1="680" y1="190" x2="680" y2="214" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="500" y1="214" x2="860" y2="214" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="500" y1="214" x2="500" y2="234" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<line x1="860" y1="214" x2="860" y2="234" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="360" y="238" width="280" height="92" rx="7" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1.4"/>
+<text x="500.0" y="255" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  tail-injection ICO</text>
+<text x="368" y="272" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="368" dy="0">encodes charge in PVT-dependent f(I);</tspan><tspan x="368" dy="10.5">lin↔PN op-points contradict</tspan><tspan x="368" dy="10.5">(no PVT margin)</tspan><tspan x="368" dy="10.5">— superseded</tspan></text>
+<rect x="720" y="238" width="300" height="92" rx="7" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1.4"/>
+<text x="870.0" y="255" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  charge-balancing ΔΣ  (0.5 fF node)</text>
+<text x="728" y="272" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="728" dy="0">retired (ADR-005): no free oversampling;</tspan><tspan x="728" dy="10.5">every sub-block re-adds the cost</tspan><tspan x="728" dy="10.5">0.5 fF node — modulation too high</tspan></text>
+<line x1="1130" y1="190" x2="1130" y2="214" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="1010" y="218" width="240" height="34" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1130.0" y="235" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">single-slope CIS</text>
+<text x="1018" y="252" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"></text>
+<line x1="1130" y1="252" x2="1130" y2="272" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="1010" y1="272" x2="1250" y2="272" stroke="#1a1a1a" stroke-width="1.4"/>
+<line x1="1010" y1="272" x2="1010" y2="292" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<line x1="1250" y1="272" x2="1250" y2="292" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="890" y="296" width="250" height="78" rx="7" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1.4"/>
+<text x="1015.0" y="313" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  charge-up  (rising ramp)</text>
+<text x="898" y="330" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="898" dy="0">0.72 V ramp top from the 0.8 V rail:</tspan><tspan x="898" dy="10.5">&lt; 80 mV, cannot cascode</tspan><tspan x="898" dy="10.5">→ ramp_inl_reverse = 1</tspan></text>
+<rect x="1150" y="296" width="190" height="78" rx="7" fill="#e6f4ee" stroke="#1b7f5b" stroke-width="1.4"/>
+<text x="1245.0" y="313" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✓  discharge  (falling ramp)</text>
+<text x="1158" y="330" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1158" dy="0">ACCEPTED (ADR-005)</tspan><tspan x="1158" dy="10.5">→ ramp_inl_reverse = 0</tspan></text>
+<line x1="1245" y1="374" x2="1245" y2="396" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="1010" y="400" width="340" height="130" rx="7" fill="#e6f4ee" stroke="#1b7f5b" stroke-width="1.4"/>
+<text x="1180.0" y="417" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✓  ACCEPTED — single-slope CIS readout</text>
+<text x="1018" y="434" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1018" dy="0">2.0 pF C_int, discharge mode</tspan><tspan x="1018" dy="10.5">cascode NMOS sink + replica servo ramp</tspan><tspan x="1018" dy="10.5">chopped/AZ preamp, I_tail 30 µA</tspan><tspan x="1018" dy="10.5">12-bit, 6 GHz ×4-phase Gray TDC</tspan><tspan x="1018" dy="10.5">3-point (quadratic) calibration</tspan><tspan x="1018" dy="10.5">carry-select counter · CML clock · static CMOS logic</tspan></text>
+<line x1="1180" y1="530" x2="1180" y2="552" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="1000" y="556" width="360" height="66" rx="7" fill="#fbf1dc" stroke="#b8860b" stroke-width="1.4"/>
+<text x="1180.0" y="573" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">◐  OPEN</text>
+<text x="1008" y="590" font-size="8.8" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1008" dy="0">Spectre transient-noise histogram</tspan><tspan x="1008" dy="10.5">lifts CONDITIONAL GO → GO</tspan></text>
+<text x="120" y="470" font-size="11" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Secondary rejected decisions (see DECISION_LEDGER.md):</text>
+<text x="128" y="492" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  10-bit quantization — crest-factor failure</text>
+<text x="128" y="508" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  CDS — −1.7 dB (comparator dominates kT/C and 1/f)</text>
+<text x="128" y="524" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  300 MHz PD chopper — cyclostationary mixer</text>
+<text x="128" y="540" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  DAC ramp ≤4-pt cal — scoring artifact (42 dB vs 58 dB)</text>
+<text x="128" y="556" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  1 pF C_int — rail collision</text>
+<text x="128" y="572" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  15 µA comparator tail — settling time</text>
+<text x="128" y="588" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  ripple-carry Gray counter — SS/125 °C timing</text>
+<text x="128" y="604" font-size="9.6" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">✗  Xyce via conda — Trilinos missing NOX/LOCA</text>
+<rect x="0" y="834" width="1400" height="46" rx="0" fill="#fff3f3" stroke="#c0392b" stroke-width="1"/>
+<text x="700.0" y="854" font-size="14" text-anchor="middle" fill="#c0392b" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">PRELIMINARY CONCEPT — NO SILICON EXISTS</text>
+<text x="12" y="896" font-size="9.4" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Architecture decision tree for the GCB receiver. Kill reasons are specific to the GCB operating point (0.8 V, 256 ns, crest 6, 56 dB target). Mirrors DECISION_LEDGER.md; the accepted path is CONDITIONAL GO pending a commercial transient-noise histogram.</text>
+</svg>

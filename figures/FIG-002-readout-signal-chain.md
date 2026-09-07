@@ -68,7 +68,7 @@ solve is host/firmware float".
 
 ## Render Status
 
-`SPEC`. Data revision: n/a.
+`APPROVED` — SVG rendered by `figures/render_figs.py` on 2026-09-07, committed as `figures/FIG-002-readout-signal-chain.svg`. Verified: XML well-formed, the burned-in string "PRELIMINARY CONCEPT — NO SILICON EXISTS" present, every label/number in this spec present in the SVG text, no viewBox overflow. Data revision: schematic — this spec is the source of truth (numbers trace onward via the Sources list).
 
 ## Disclaimer Text
 

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1620 700" width="1620" height="700" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">
+<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/></marker><marker id="arwg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9aa4ad"/></marker></defs>
+<rect x="0" y="0" width="1620" height="700" fill="#ffffff"/>
+<text x="20" y="30" font-size="17" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">FIG-006  Package / pinout  (concept — not a pinout)</text>
+<text x="20" y="50" font-size="11" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Schematic, not to scale. No pin count, ball map, footprint or package size is defined. All values TBD.</text>
+<text x="40" y="82" font-size="12" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">A — package cross-section (schematic, not to scale)</text>
+<rect x="40" y="100" width="560" height="34" rx="3" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="320.0" y="121.0" font-size="10" text-anchor="middle" fill="#1a1a1a" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">5  lid / heat spreader over the pilot die  —  thermal path; photonic die near-isothermal (ADR-001)</text>
+<rect x="40" y="144" width="274.0" height="70" rx="3" fill="#e6f4ee" stroke="#1b7f5b" stroke-width="1.4"/>
+<text x="50" y="166" font-size="9.2" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="50" dy="0">3  pilot die (FPGA/ASIC)</tspan><tspan x="50" dy="12">digital + single-slope readout + MMIO</tspan></text>
+<rect x="326.0" y="144" width="274.0" height="70" rx="3" fill="#eef2f5" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="336.0" y="166" font-size="9.2" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="336.0" dy="0">3  photonic die</tspan><tspan x="336.0" dy="12">MZ reduction mesh, PDs, thermal tuners</tspan></text>
+<rect x="592" y="158" width="44" height="42" rx="3" fill="#fbf1dc" stroke="#b8860b" stroke-width="1.4"/>
+<text x="640" y="156" font-size="9" text-anchor="start" fill="#7a5c00" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">4  WDM fiber ribbon, N lanes — N TBD</text>
+<rect x="40" y="224" width="560" height="26" rx="3" fill="#e8ebee" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="320.0" y="241.0" font-size="10" text-anchor="middle" fill="#1a1a1a" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">2  silicon interposer</text>
+<rect x="40" y="260" width="560" height="30" rx="3" fill="#f0f2f4" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="320.0" y="279.0" font-size="10" text-anchor="middle" fill="#1a1a1a" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">1  substrate + BGA field  —  host + power balls — count TBD</text>
+<text x="40" y="312" font-size="9" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">N, layer counts, thicknesses: all TBD</text>
+<text x="700" y="82" font-size="12" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">B — external interface groups (no pin numbers)</text>
+<rect x="850" y="150" width="220" height="220" rx="6" fill="#eef2f5" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="960" y="265" font-size="11" text-anchor="middle" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">GCB package</text>
+<rect x="1160" y="148" width="460" height="70" rx="5" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1170" y="164" font-size="10.5" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Host</text>
+<text x="1170" y="179" font-size="8.4" text-anchor="start" fill="#54606b" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1170" dy="0">PCIe or AXI4 to host SoC;</tspan><tspan x="1170" dy="9.5">MMIO register window (registers.yaml, 0x00–0xC0)</tspan></text>
+<line x1="1070" y1="260" x2="1160" y2="182" stroke="#9aa4ad" stroke-width="1"/>
+<rect x="1160" y="228" width="460" height="70" rx="5" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1170" y="244" font-size="10.5" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Optical</text>
+<text x="1170" y="259" font-size="8.4" text-anchor="start" fill="#54606b" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1170" dy="0">WDM input fiber(s) → reduction mesh; monitor tap out</tspan></text>
+<line x1="1070" y1="260" x2="1160" y2="262" stroke="#9aa4ad" stroke-width="1"/>
+<rect x="1160" y="308" width="460" height="70" rx="5" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1170" y="324" font-size="10.5" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Bench loopback</text>
+<text x="1170" y="339" font-size="8.4" text-anchor="start" fill="#54606b" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1170" dy="0">parallel DAC out / SPI-SAR-ADC in</tspan><tspan x="1170" dy="9.5">(greencoyote_dac_if.sv / greencoyote_adc_if.sv)</tspan><tspan x="1170" dy="9.5">— present for bring-up, not a product datapath</tspan></text>
+<line x1="1070" y1="260" x2="1160" y2="342" stroke="#9aa4ad" stroke-width="1"/>
+<rect x="1160" y="388" width="460" height="70" rx="5" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1170" y="404" font-size="10.5" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Clock</text>
+<text x="1170" y="419" font-size="8.4" text-anchor="start" fill="#54606b" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1170" dy="0">6 GHz reference in (or on-die PLL ref);</tspan><tspan x="1170" dy="9.5">4-phase generated on-die in CML</tspan></text>
+<line x1="1070" y1="260" x2="1160" y2="422" stroke="#9aa4ad" stroke-width="1"/>
+<rect x="1160" y="468" width="460" height="70" rx="5" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1170" y="484" font-size="10.5" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Power</text>
+<text x="1170" y="499" font-size="8.4" text-anchor="start" fill="#54606b" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1170" dy="0">core 0.7 V (logic), 0.8 V (readout analog),</tspan><tspan x="1170" dy="9.5">photonic tuner rail, PD bias — currents TBD</tspan></text>
+<line x1="1070" y1="260" x2="1160" y2="502" stroke="#9aa4ad" stroke-width="1"/>
+<rect x="1160" y="548" width="460" height="70" rx="5" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1170" y="564" font-size="10.5" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Debug</text>
+<text x="1170" y="579" font-size="8.4" text-anchor="start" fill="#54606b" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1170" dy="0">JTAG / scan</tspan></text>
+<line x1="1070" y1="260" x2="1160" y2="582" stroke="#9aa4ad" stroke-width="1"/>
+<rect x="0" y="634" width="1620" height="46" rx="0" fill="#fff3f3" stroke="#c0392b" stroke-width="1"/>
+<text x="810.0" y="654" font-size="14" text-anchor="middle" fill="#c0392b" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">PRELIMINARY CONCEPT — NO SILICON EXISTS</text>
+<text x="12" y="696" font-size="9.5" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Concept package arrangement — schematic, not to scale, not a pinout. No GCB package has been designed or fabricated. All pin counts, dimensions, voltages, and currents are TBD.</text>
+</svg>

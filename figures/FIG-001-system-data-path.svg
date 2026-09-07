@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1460 470" width="1460" height="470" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">
+<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/></marker><marker id="arwg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9aa4ad"/></marker></defs>
+<rect x="0" y="0" width="1460" height="470" fill="#ffffff"/>
+<text x="20" y="30" font-size="17" text-anchor="start" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">FIG-001  System data path</text>
+<text x="20" y="50" font-size="11" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Logical data path, left to right. One analog→digital conversion (stage 4). Arrow length has no timing meaning.</text>
+<rect x="24" y="92" width="208" height="150" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="128.0" y="114" font-size="12.5" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">1  Vortex 3.0 TCU</text>
+<text x="34" y="136" font-size="10.3" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="34" dy="0">VX_tcu_core.result_if</tspan><tspan x="34" dy="13">emits PE words + is_tile_final</tspan></text>
+<rect x="24" y="250" width="208" height="30" rx="4" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1"/>
+<text x="32" y="264" font-size="8.6" text-anchor="start" fill="#54606b" font-family="'DejaVu Sans Mono','Courier New',monospace"><tspan x="32" dy="0">gcb-rtl/integration/</tspan><tspan x="32" dy="10">VX_tcu_tilefinal_tag.sv</tspan></text>
+<line x1="232" y1="167.0" x2="252" y2="167.0" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="252" y="92" width="208" height="150" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="356.0" y="114" font-size="12.5" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">2  Q17.14 carry-save stream</text>
+<text x="262" y="136" font-size="10.3" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="262" dy="0">M_AXIS_CS AXI4-Stream</tspan><tspan x="262" dy="13">one record per tile-final</tspan><tspan x="262" dy="13">NUM_LANES beats</tspan><tspan x="262" dy="13">block-float 32→12</tspan></text>
+<rect x="252" y="250" width="208" height="30" rx="4" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1"/>
+<text x="260" y="264" font-size="8.6" text-anchor="start" fill="#54606b" font-family="'DejaVu Sans Mono','Courier New',monospace"><tspan x="260" dy="0">gcb-rtl/integration/</tspan><tspan x="260" dy="10">VX_tcu_shim_q1714.sv</tspan></text>
+<line x1="460" y1="167.0" x2="480" y2="167.0" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="480" y="92" width="208" height="150" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="584.0" y="114" font-size="12.5" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">3  Optical cascade</text>
+<text x="490" y="136" font-size="10.3" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="490" dy="0">8-input reduction cells</tspan><tspan x="490" dy="13">analog optical sum</tspan><tspan x="490" dy="13">noise floor reset per stage (ADR-001)</tspan></text>
+<rect x="480" y="250" width="208" height="30" rx="4" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1"/>
+<text x="488" y="264" font-size="8.6" text-anchor="start" fill="#54606b" font-family="'DejaVu Sans Mono','Courier New',monospace"><tspan x="488" dy="0">gcb-rtl/rtl/greencoyote_photonic_sequencer.sv,</tspan><tspan x="488" dy="10">greencoyote_cs_lane_fifo.sv</tspan></text>
+<line x1="688" y1="167.0" x2="708" y2="167.0" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="708" y="92" width="208" height="150" rx="7" fill="#e6f4ee" stroke="#1b7f5b" stroke-width="1.4"/>
+<text x="812.0" y="114" font-size="12.5" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">4  Single-slope readout</text>
+<text x="718" y="136" font-size="10.3" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="718" dy="0">discharge-mode C_int 2 pF</tspan><tspan x="718" dy="13">chopped/AZ comparator vs shared ramp</tspan><tspan x="718" dy="13">6 GHz Gray TDC ×4-phase</tspan><tspan x="718" dy="13">3-point calib</tspan></text>
+<rect x="708" y="250" width="208" height="30" rx="4" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1"/>
+<text x="716" y="264" font-size="8.6" text-anchor="start" fill="#54606b" font-family="'DejaVu Sans Mono','Courier New',monospace"><tspan x="716" dy="0">gcb-rtl/rtl/greencoyote_ss_tdc.sv,</tspan><tspan x="716" dy="10">greencoyote_ss_calib.sv</tspan></text>
+<line x1="916" y1="167.0" x2="936" y2="167.0" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<text x="812.0" y="234" font-size="10.5" text-anchor="middle" fill="#1b7f5b" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">→ x_hat (Q2.16)</text>
+<rect x="936" y="92" width="208" height="150" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1040.0" y="114" font-size="12.5" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">5  MMIO register block</text>
+<text x="946" y="136" font-size="10.3" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="946" dy="0">SS_READOUT 0xB0–0xC0</tspan><tspan x="946" dy="13">registers.yaml</tspan></text>
+<rect x="936" y="250" width="208" height="30" rx="4" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1"/>
+<text x="944" y="264" font-size="8.6" text-anchor="start" fill="#54606b" font-family="'DejaVu Sans Mono','Courier New',monospace"><tspan x="944" dy="0">gcb-rtl/rtl/greencoyote_pilot_regs.sv,</tspan><tspan x="944" dy="10">greencoyote_axi_lite_wrapper.sv</tspan></text>
+<line x1="1144" y1="167.0" x2="1164" y2="167.0" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arw)"/>
+<rect x="1164" y="92" width="208" height="150" rx="7" fill="#f4f6f8" stroke="#5b6b7a" stroke-width="1.4"/>
+<text x="1268.0" y="114" font-size="12.5" text-anchor="middle" fill="#1a1a1a" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">6  Host</text>
+<text x="1174" y="136" font-size="10.3" text-anchor="start" fill="#1a1a1a" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif"><tspan x="1174" dy="0">gcb_proxy.py safety supervisor</tspan><tspan x="1174" dy="13">gcb-dashboard live view</tspan></text>
+<rect x="1164" y="250" width="208" height="30" rx="4" fill="#f0f2f4" stroke="#9aa4ad" stroke-width="1"/>
+<text x="1172" y="264" font-size="8.6" text-anchor="start" fill="#54606b" font-family="'DejaVu Sans Mono','Courier New',monospace"><tspan x="1172" dy="0">gcb-host/</tspan></text>
+<text x="242.0" y="159.0" font-size="9.5" text-anchor="middle" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">RNE, saturating</text>
+<line x1="1144" y1="167.0" x2="1164" y2="167.0" stroke="#1a1a1a" stroke-width="1.4" marker-start="url(#arw)" marker-end="url(#arw)"/>
+<text x="1154.0" y="159.0" font-size="9.5" text-anchor="middle" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">MMIO</text>
+<text x="20" y="308" font-size="10" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Schematic — no data binding. Illustrates gcb-spec/architecture.md (&quot;Data path&quot;). Vortex-side blocks 1–2 are integration contracts, never synthesised into the pilot.</text>
+<rect x="0" y="380" width="1460" height="46" rx="0" fill="#fff3f3" stroke="#c0392b" stroke-width="1"/>
+<text x="730.0" y="400" font-size="14" text-anchor="middle" fill="#c0392b" font-weight="bold" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">PRELIMINARY CONCEPT — NO SILICON EXISTS</text>
+<text x="12" y="442" font-size="9.5" text-anchor="start" fill="#54606b" font-weight="normal" font-family="'Helvetica Neue',Arial,'DejaVu Sans',sans-serif">Logical data path, not to scale. No GCB hardware has been fabricated or measured. Vortex-side blocks are integration contracts staged in gcb-rtl for review, not part of the GreenCoyote-Bay pilot build.</text>
+</svg>

@@ -71,7 +71,7 @@ worth ≈ 0.7 dB p05 vs charge-up (reverse = 1); it is not optional."
 
 ## Render Status
 
-`SPEC`. Data revision: n/a.
+`APPROVED` — SVG rendered by `figures/render_figs.py` on 2026-09-07, committed as `figures/FIG-003-ramp-polarity.svg`. Verified: XML well-formed, the burned-in string "PRELIMINARY CONCEPT — NO SILICON EXISTS" present, every label/number in this spec present in the SVG text, no viewBox overflow. Data revision: schematic — this spec is the source of truth (numbers trace onward via the Sources list).
 
 ## Disclaimer Text
 
