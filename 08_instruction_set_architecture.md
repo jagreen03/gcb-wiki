@@ -73,6 +73,25 @@ case 4 GiB per tensor is ample headroom and the aggregate-footprint concern
 does not apply). A real open question this width surfaces, not a defect
 quietly designed around.
 
+**Resolved (TKT-003 / TKT-004 — Base-Pointer Registers).** The second reading
+above is the one adopted: `a_ptr` / `b_ptr` / `dst_ptr` are **32-bit
+within-region byte offsets**, not flat addresses. `gcb_tensor_address_
+translation.sv` holds four architected 48-bit base registers — `BASE_A`,
+`BASE_B`, `BASE_DST`, `BASE_SCRATCH` — reset to 0 and programmed over a
+CSR/MMIO path, and forms the effective address once per GEMM as
+
+$$EA_{48} = BASE[\text{role}] + \text{zero\_extend}(ptr_{32})$$
+
+where *role* is A / B / DST by default. A trade study (TKT-004) chose this
+over a hardware MMIO/TLB (12–20× the area for translation generality a
+three-region sequential-streaming engine never uses) and over bare high-bit
+concatenation (a permanent 4 GiB alignment/fragmentation tax). The 128-bit
+word is unchanged: an optional 2-bit-per-operand base-select override lives
+entirely inside the `[119:112]` reserved byte. The **256-bit conceptual
+layout's 40-bit pointer** (below) is therefore just this same quantity —
+`BASE[role] + offset32` — with the concrete word carrying the offset and the
+role (or the override field) selecting the base.
+
 **One dimension field, not three plus a tiling hint.** `OP_GEMM`'s full
 shape needs $M$, $K$, $N$, and (doc 05's own weight-stationary design)
 $N_{tile}$ — four numbers — and this word carries exactly one, `dim_k`

@@ -55,3 +55,4 @@ Evidence-doc shorthand:
 | `readout.comparator.preamp.gmc-fallback` | Open | SR3 §11 | g_m–C integrating preamp — documented, unbuilt; decouples gain from the 0.8 V load headroom. Build only if the Spectre histogram breaches 55 µV. | 2026-09-07 |
 | `optical.cell.combiner-loss` | Open | BENCH | Combiner / insertion loss regime of the discrete-component 8-input reduction cell — to be measured on the bench, not modelled. | 2026-09-02 |
 | `optical.cell.fanin` | Open | [Unfiled] | First reduction cell fan-in: 4:1 vs 8:1 not yet chosen. | 2026-09-02 |
+| `doctrine.pbg.telemetry-vector-space` | Accepted | `09_pbg_telemetry_vector_space.md`; TKT-005 | PBG taxonomy formalised as a 3D bipolar vector space — X Specification (Green/Red), Y Quality (Blue/Yellow), Z Emergence (Purple/Light-Gray); `‖T‖₂ ∈ [0, √3]`; `pgvector(3)` schema + ticket-frontmatter contract for telemetry clustering. Six colour names unchanged. | 2026-09-08 |

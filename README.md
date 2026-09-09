@@ -36,6 +36,7 @@ digestible and avoids a single spaghetti graph.
 | 06 | [`06_70B_transformer_workload_trace.md`](06_70B_transformer_workload_trace.md) | L1 | Hybrid Photonic/Vortex partitioning and a cycle-by-cycle GDDR7/SRAM trace of a LLaMA-class 70B FFN up-projection (7 GB/s, 9 MiB SRAM), validated against the existing `gcb_tensor_memory_engine` RTL parameters |
 | 07 | [`07_inline_vector_softmax.md`](07_inline_vector_softmax.md) | L1 | Quantifies the GDDR7 round-trip Amdahl's Law tax on attention Softmax (4.295 GB / 2.68 s per 80 layers) and defines the inline Photonic-to-Vortex handoff — `qam_result` feeds a local staging SRAM and a hardware-TLU Softmax unit directly, keeping data stationary on-die |
 | 08 | [`08_instruction_set_architecture.md`](08_instruction_set_architecture.md) | L1 | The programmable Execution Opcode Bus between `compiler/` and the Photonic/Vortex engines — `OP_GEMM`, `OP_SOFTMAX`, and `OP_SCALE_DIAG` (element-wise scale reframed as a diagonal-matrix GEMM to reuse the optical PE grid) — and how `HybridPartitioner`'s existing tagging maps onto it |
+| 09 | [`09_pbg_telemetry_vector_space.md`](09_pbg_telemetry_vector_space.md) | — | Doctrine: the PBG telemetry taxonomy as a 3D bipolar vector space ($X$ Specification, $Y$ Quality, $Z$ Emergence), the $\lVert\vec{T}\rVert_2$ semantics, and the `pgvector(3)` schema + ticket-frontmatter contract for telemetry clustering |
 
 ## Conventions
 
