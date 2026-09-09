@@ -147,11 +147,12 @@ recommendation, not a correctness requirement.**
 * If the base is only 64 B-aligned but *not* page-aligned, a band/tile still
   reads correctly; each matrix row simply straddles a page boundary, costing one
   extra `tRCD` (~14 ns) per row. Over a pass: `M_BANDS*GRID_DIM` rows x 14 ns ~=
-  57 us out of 2.097 ms (**2.7%**), and A's prefetch has 22x margin (sec. 6), so
+  57 us out of 2.097 ms (**2.7%**), and A's prefetch has 4x margin (sec. 6), so
   it never causes a stall — hence "recommended, not required".
 * **Rejected: arbitrary byte alignment with head/tail sub-burst + byte-rotate.**
   It adds a shifter/mask datapath and 2 partial bursts per region for <0.1%
-  bandwidth on an already 20x-over-provisioned path. Not worth the gates.
+  bandwidth on a path whose limiter is the 16 GB/s write-beat port, not GDDR7
+  (sec. 6). Not worth the gates.
 * Enforcement: the BPR programming agent / allocator aligns; the DMA asserts
   `dma_cfg_err` (sec. 9) if `ea_a[5:0] != 0` or `ea_b[5:0] != 0` at `ea_valid`
   and refuses to start.
@@ -194,52 +195,95 @@ zero remainder. So:
 
 ## 6. Latency & throughput model — the no-starve proof (criterion 5)
 
-Model: `t_load = t_coldstart + bytes / BW_sustained`, with
-`t_coldstart = tRCD + tCL` ~= 30 ns (first page of the region; subsequent pages
-hidden by the activate pipeline, sec. 4).
+> **Revised after BFM simulation (TKT-009).** An earlier draft of this section
+> modelled `t_load` against the ~90 GB/s GDDR7 channel and reported a ~20x A
+> margin. A timing-accurate GDDR7 read BFM (open-page, bank-group-interleaved,
+> real tRCD/tCL/tRP/tRC/tCCD, in-order single data bus) driving the **real**
+> `gcb_tensor_memory_engine` showed the true limiter is the DMA's own
+> **write-beat port**, not GDDR7. The corrected model and its BFM-measured
+> margins are below.
 
-### A prefetch vs the 8.192 us band deadline
+### The rate limiter: the `*_wr_data` write-beat port
+
+The arbiter delivers reassembled operands to the engine one `VEC_W`
+(`VEC_BYTES` = 8 B at INT4) write-beat per fabric cycle, from a **single shared
+spiller** (A and B take turns on it — sec. 8). That is the narrowest point in
+the whole path:
+
+```
+write-beat port : VEC_BYTES * f_fabric = 8 B * 2 GHz   = 16 GB/s   (sustained, shared A+B)
+GDDR7 channel   : ~90 GB/s sustained (~70% of 128 GB/s peak)       = 5.6x faster
+```
+
+GDDR7 is therefore **never** the bottleneck for keeping the array fed; its job
+is only (a) to sustain >= 16 GB/s into the burst-reassembly FIFO and (b) to keep
+the 8-deep bank-group activate pipeline full so per-page tRCD/tCL is hidden.
+Both hold with wide margin (aggregate demand ~4.8 GB/s, sec. "Aggregate" below).
+
+### A prefetch vs the band deadline
 
 `gcb_tensor_sram_controller` issues the next-A-band request at `at_band_start`
-of the current band; it must land before the *next* band boundary — exactly one
-band residency of lead.
+of the current band; it must land before the *next* band boundary — one band
+residency of lead = `N_SUBTILES * K_STEPS` cycles.
 
 ```
-t_load(A) = 30 ns + 32 KiB / 90 GB/s = 30 ns + 364 ns = 0.394 us
-deadline  = 8.192 us
-margin    = 20.8x
+t_fill(A)  = GRID_DIM * K_STEPS cycles            (one write-beat per cycle)
+           = 16 * 256 = 4096 cyc = 2.048 us @ 2 GHz          (+ ~58 cyc cold page, hidden after)
+deadline   = N_SUBTILES * K_STEPS = 64 * 256 = 16384 cyc = 8.192 us
+margin     = N_SUBTILES / GRID_DIM = 64 / 16 = 4x
 ```
 
-Even at a pathological 10 GB/s sustained: `30 ns + 3.28 us = 3.3 us < 8.192 us`
-(2.5x). **A never starves the array.**
+The margin is structural: `N_TILE > GRID_DIM^2` (Doc 04 tiling) forces
+`N_SUBTILES = N_TILE/GRID_DIM > GRID_DIM`, i.e. margin `> 1` always, `= 4x` at
+defaults.
 
-### B prefetch vs the 2.097 ms pass deadline
+### B prefetch vs the pass deadline
 
-Requested at `at_pass_start`, due before the next pass boundary:
+Requested at `at_pass_start`, due before the next pass boundary. During that
+pass window the shared write port also carries **all `M_BANDS` A-band reloads**,
+so the honest check is combined occupancy, not B in isolation:
 
 ```
-t_load(B) = 30 ns + 2 MiB / 90 GB/s = 30 ns + 23.3 us = 23.3 us
-deadline  = 2097 us
-margin    = 90x
+t_fill(B)          = N_TILE * K_STEPS         = 1024 * 256      = 262144 cyc
+A reloads / pass   = M_BANDS * GRID_DIM * K_STEPS = 256*16*256  = 1048576 cyc
+combined demand    = 1310720 cyc
+pass residency     = M_BANDS * N_SUBTILES * K_STEPS = 256*64*256 = 4194304 cyc
+combined occupancy = 1310720 / 4194304 = 31%   ->  ~3.2x combined margin
 ```
 
 ### Cold start (ST_PRIME)
 
-Band 0 + tile 0 must both land before `ST_RUN`. B dominates: ~23.3 us. This is a
-one-time latency *before* the sequence clock starts — no deadline — and is
-0.28% of the 8.39 ms GEMM.
+Band 0 + tile 0 must both land before `ST_RUN`. B dominates:
+`262144 cyc = 131 us`. One-time, *before* the sequence clock starts — no
+deadline — ~1.6% of the 8.39 ms GEMM.
 
 ### Aggregate GDDR7 demand (cross-check against `05`)
 
 A: re-streamed `N_PASSES` x = 8 MiB x 4 = 32 MiB over 8.39 ms = **3.8 GB/s**.
 B: read once ever = 8 MiB over 8.39 ms = **0.95 GB/s**.
 Combined **~4.8 GB/s read** vs. `05`'s "5 GB/s read" line and the ~90 GB/s
-channel — **~5% channel occupancy**. The design is bandwidth-trivial; the only
-real question was latency vs. the ping-pong deadline, and A clears it 20x over.
+channel — **~5% channel occupancy**, and ~30% of the 16 GB/s write-beat port.
 
-**Constraint that must hold:** GDDR7 sustained read >= ~10 GB/s and cold-page
-latency <= ~1 us. Both are ~10x inside a single commodity GDDR7 channel's
-envelope.
+### BFM-measured results (TKT-009, `sim/cocotb/test_dma_arbiter.py`)
+
+Reduced geometry chosen to preserve every inequality above with a real finite
+margin: `K_STEPS=32, N_SUBTILES=64, M_BANDS=64, N_PASSES=2` (LPB=2). One full
+2-pass GEMM through the real engine + arbiter + GDDR7 BFM:
+
+| Quantity | Measured | Deadline | Margin |
+|---|---|---|---|
+| A band load (`a_load_req`->`a_load_done`), n=128 | 578–767 cyc (mean 632) | 2048 cyc band residency | **2.7–3.5x** |
+| B pass-1 tile load | <= 50 416 cyc | 131 072 cyc pass residency | **2.6x** |
+| `sram_valid` stall cycles in `ST_RUN` over the whole GEMM | **0** | — | — |
+| Page-boundary A-preempts-B events (`preempt_req_q` rises) | 24 | — | A meets deadline every time |
+
+The measured A margin (2.7–3.5x) sits just under the 4x analytic figure — the
+gap is preemption drain + re-arbitration overhead, which the 4x structural
+headroom absorbs. **Zero stall cycles is the no-starve proof.**
+
+**Constraint that must hold:** GDDR7 sustained read >= 16 GB/s (the write-beat
+port rate) and cold-page latency <= ~1 us. Both are ~5x inside a single
+commodity GDDR7 channel's envelope.
 
 ---
 
@@ -286,16 +330,19 @@ channel — a second port is pure waste).
 **Policy: strict priority to A; B is preemptible at DRAM-page boundaries.**
 
 * A's deadline is 8.192 us and A requests arrive 256x more often than B's, but
-  an A band is tiny (0.39 us) and a B tile is large (23 us). If B held the port
-  non-preemptibly, a B tile in flight could delay an A band by up to 23 us >
-  A's deadline -> stall.
-* On `a_load_req` rising: the DMA finishes the **current B page** (<= 16 BL32
-  bursts, ~1.8 us at 90 GB/s), then services the **entire** A band (0.39 us),
-  then resumes B from the next page.
-* Worst-case A latency = drain current B page + A band = **~2.2 us << 8.192 us**
-  (3.7x margin, on top of sec. 6's 20x).
-* B is set back by `M_BANDS` A-band interruptions per pass = 256 x 0.39 us ~=
-  **100 us** out of the 2.097 ms pass -> B still lands with ~20x margin.
+  an A band is small (2.05 us to fill at 16 GB/s) and a B tile is large
+  (131 us). If B held the port non-preemptibly, a B tile in flight could delay
+  an A band far past A's deadline -> stall.
+* On `a_load_req` rising: the DMA sets `preempt_req_q`, finishes the **current B
+  page** (<= LPB BL32 bursts), drains its in-flight bursts, saves B's
+  `{region_base, next_line}` context, services the **entire** A band, then
+  resumes B from the saved context (not a restart).
+* Worst-case A latency = drain current B page + pipeline drain + A band fill.
+  BFM-measured (sec. 6, reduced geometry): **578–767 cyc vs 2048-cyc band
+  residency = 2.7–3.5x margin**; zero stalls over a full 2-pass GEMM.
+* B is set back by the A-band interruptions that overlap its load. Since the B
+  tile fills in ~31% of the pass window even with every A reload interleaved
+  (sec. 6), it still lands with ~2.6x margin (BFM-measured).
 * **Page-boundary preemption, not beat-level:** resuming B mid-page would cost a
   re-activate (`tRP + tRCD` ~= 28 ns); resuming at a page boundary costs
   nothing, and A's margin is large enough that waiting <= 1.8 us for the page to
