@@ -38,6 +38,7 @@ digestible and avoids a single spaghetti graph.
 | 08 | [`08_instruction_set_architecture.md`](08_instruction_set_architecture.md) | L1 | The programmable Execution Opcode Bus between `compiler/` and the Photonic/Vortex engines — `OP_GEMM`, `OP_SOFTMAX`, and `OP_SCALE_DIAG` (element-wise scale reframed as a diagonal-matrix GEMM to reuse the optical PE grid) — and how `HybridPartitioner`'s existing tagging maps onto it |
 | 09 | [`09_pbg_telemetry_vector_space.md`](09_pbg_telemetry_vector_space.md) | — | Doctrine: the PBG telemetry taxonomy as a 3D bipolar vector space ($X$ Specification, $Y$ Quality, $Z$ Emergence), the $\lVert\vec{T}\rVert_2$ semantics, and the `pgvector(3)` schema + ticket-frontmatter contract for telemetry clustering |
 | 10 | [`10_open_source_eda_toolchain.md`](10_open_source_eda_toolchain.md) | — | Doctrine: the open-source RTL-to-GDSII flow — Verilator + Cocotb for verification, Yosys + Surelog/UHDM into OpenROAD (5 nm) for synthesis and layout, and Python + Jinja2 templating (no Chisel/Amaranth) for hardware generation |
+| 11 | [`11_gddr7_tensor_dma_architecture.md`](11_gddr7_tensor_dma_architecture.md) | L1 | The GDDR7 → Engine-Local SRAM operand loader (TKT-008): EA→byte-address derivation, A row-major / B transposed DRAM layout, BL32 burst coalescing with an 8-deep bank-group activate pipeline, the latency model proving the A prefetch clears the 8.192 µs ping-pong deadline 20×, strict-priority-A / page-preemptible-B arbitration, and the keep/adapt/discard call on `greencoyote_streaming_dma` |
 
 ## Conventions
 
