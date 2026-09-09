@@ -50,7 +50,7 @@ one test:
 | tier | holds | per-token cost |
 |---|---|---|
 | photonic weight state (MZI / ring / PCM) | one resident weight block | 0 fetch - programmed on load |
-| on-die SRAM (MB) | bit-plane Tx buffers, K<=16 partial-sum accumulators, KV line buffers | on-die only |
+| on-die SRAM (MB) | bit-plane Tx buffers (see [`13_bitplane_tx_mapper.md`](13_bitplane_tx_mapper.md)), K<=16 partial-sum accumulators, KV line buffers | on-die only |
 | local LPDDR5X (a slice of HBM only if KV BW forces it) | KV cache for this tile's layers, model-load staging, weight spill | KV read/write only |
 | host / CXL / NVMe pool | full model store, model swap, paged-KV offload | load & eviction only - never per token |
 

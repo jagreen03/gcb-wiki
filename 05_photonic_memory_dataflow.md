@@ -196,6 +196,9 @@ flowchart LR
 
 ## Related
 
+- [`13_bitplane_tx_mapper.md`](13_bitplane_tx_mapper.md) — the INT4↔optical
+  bit-plane encoding whose Tx staging (`operand_flat`, 4 planes × `NUM_OPERANDS`
+  bits/beat) draws on the on-die SRAM budget sized in sec. 7.
 - `goal.md` — Memory Architecture Doctrine and the Dwarf-Star bandwidth /
   economic targets this dataflow model must satisfy.
 - [`03_dual_mode_integration.md`](03_dual_mode_integration.md) — $K \le 16$

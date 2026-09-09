@@ -120,6 +120,9 @@ flowchart LR
 
 ## Related
 
+- [`13_bitplane_tx_mapper.md`](13_bitplane_tx_mapper.md) — the full specification
+  of the V2.0 per-lane bit-plane drive scheme in the table above (INT4 → 4
+  unweighted antipodal planes, colour × I/Q lane map, algebraic INT16 recovery).
 - [`00_system_context.md`](00_system_context.md) — the five-block fabric view.
 - [`02_receiver_architecture.md`](02_receiver_architecture.md) — Phase I / II
   receiver datapath and the no-routed-analog-voltage invariant.

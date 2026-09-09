@@ -272,6 +272,9 @@ it are now proven to agree, not merely observed to agree once.
 
 ## Related
 
+- [`13_bitplane_tx_mapper.md`](13_bitplane_tx_mapper.md) — how the `qam_result`
+  INT16 stream this handoff consumes is reconstructed from the optical
+  cross-products (`Y = Σ W_i W_j S_ij`).
 - [`05_photonic_memory_dataflow.md`](05_photonic_memory_dataflow.md) — the
   GDDR7 bandwidth figures (128 GB/s/device) sec. 1.2's latency estimate
   reuses directly, and the Engine-Local SRAM budget (sec. 7) will eventually

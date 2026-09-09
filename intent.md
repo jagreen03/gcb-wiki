@@ -9,7 +9,7 @@ To transition the GCB Photonic QAM Accelerator from a mathematical architecture 
 * **Scope:** Components 1 (AXI), 2 (Tx Mapper), 3 (Wavelength Router), and 6 (Rx Recombiner).
 * **Domain:** Discrete-time digital logic.
 * **Toolchain:** SystemVerilog, Verilator, standard-cell synthesis (Yosys/OpenROAD).
-* **Role:** The digital brain. It prepares the unweighted bit-planes and algebraically reconstructs the final INT16 answers.
+* **Role:** The digital brain. It prepares the unweighted bit-planes and algebraically reconstructs the final INT16 answers — the encode/decode math is specified in [`gcb-wiki/13_bitplane_tx_mapper.md`](13_bitplane_tx_mapper.md).
 
 ### Repository 2: `gcb-analog-rx` (Mixed-Signal Baseband)
 
