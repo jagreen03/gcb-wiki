@@ -114,6 +114,14 @@ flowchart LR
 
 ## 3. Hardware Softmax, Structurally
 
+> The Photonic→Vortex hand-off itself (compute stream → staging → `ST_FIND_MAX`
+> `x − max(x)` pre-pass) is exercised end-to-end in
+> `gcb-wdm-transceiver/sim/cocotb/test_compute_e2e.py` (EPIC TKT-017 Story 4):
+> one 16×16 MAC output tile is staged as a `VEC_LEN=256` row and
+> `gcb_inline_vector_unit`'s `row_max` is checked bit-exact against
+> `numpy.max`. `ST_TLU_EXP` / `ST_SUM_EXP` / `ST_NORMALIZE` numerics remain out
+> of that proof's scope (sec. 4/5).
+
 Four-stage FSM (`rtl/gcb_inline_vector_unit.sv`), matching the numerically
 stable Softmax algorithm's own data dependencies exactly — each stage's
 output is a real input the next stage cannot start without:

@@ -228,6 +228,15 @@ fits the already-committed RTL's parameter space, not a hypothetical one.
 
 ## Related
 
+- `gcb-wdm-transceiver/sim/cocotb/test_compute_e2e.py` (EPIC TKT-017 Story 4) —
+  runs one representative tile of this trace's projection GEMM through the full
+  verified compute path (frozen `gcb_tensor_sram_controller` → `gcb_operand_stage`
+  → `gcb_mac_tile_array` → `gcb_tile_requantize` → `gcb_inline_vector_unit`
+  softmax pre-pass) at the real on-die grid width (GRID_DIM=16, K_MAX=16, 256 PEs,
+  256 B/cycle), and confirms **0 SRAM read stalls** and the peak 4096 MAC/cycle
+  rate sec. 4 predicts, bit-exact against a NumPy INT4 golden.
+  `gcb-wdm-transceiver/docs/PPA_burndown.md` tabulates the per-block gate
+  estimates and this run's cycle figures.
 - [`05_photonic_memory_dataflow.md`](05_photonic_memory_dataflow.md) — the
   reuse strategy, hardware constants, and SRAM-sizing convention this
   document re-applies rather than re-derives.
