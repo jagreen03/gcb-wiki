@@ -477,6 +477,23 @@ into an 8×8 unitary mesh; physical superposition performs the sum").
 **Missing:** wavelength count, channel spacing, laser type (DFB/VCSEL/comb),
 modulator type/bandwidth, any power budget — none of this is recorded
 anywhere in the surveyed repositories.
+
+**Maintainer flag, 2026-09-12 (`TKT-033`):** beyond being Missing, this
+Part's whole DWDM/"8×8 unitary mesh" framing has **no corroboration in
+`gcb-spec`** (checked directly, not assumed) — `gcb-spec/task3_physical_bom.md`
+and `gcb-spec/bench_emulation_parameters.md` (the actual authoritative
+Phase I spec) both describe a **single** O-band (1310 nm) CW laser
+source with linear VOA intensity modulation, and a power-summing
+fused-fiber/MMI combiner — not wavelength-division multiplexing at any
+channel count. `gcb-pic-core`'s own "K=16 balanced-homodyne multiplier
+tile" near-term goal cites *this wiki document* (via `goal.md` §2) as its
+source, not `gcb-spec` directly — meaning the WDM framing this Part
+describes may have no grounding beyond this wiki page itself. Flagged
+for a human maintainer's review, not corrected unilaterally here: either
+reconcile this Part's text with `gcb-spec`'s actual single-wavelength
+model, or — if an 8×8 WDM mesh is a real, intentionally-separate Phase II
+concept — add the `gcb-spec` citation that should have grounded it from
+the start.
 - **Role:** light source + wavelength-division modulation feeding Part 8's
   mesh.
 - **Interfaces / data formats / performance targets / dependencies /

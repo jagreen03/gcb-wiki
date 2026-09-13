@@ -62,7 +62,22 @@ physical-PPA claim unless explicitly marked otherwise.
 **Performance boundaries**
 
 * Wavelength count: **60λ** (`ESTIMATE/ASSUMPTION`, GCB-034/GCB-037 link budget) vs. **64 lanes** (`PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS`, `TKT-019.1`'s own router test ceiling) — **kept deliberately distinct, per `14`'s own doctrine; this document does not merge them.**
-* Channel spacing: 50 GHz grid (`ASSUMPTION`).
+* Channel spacing: 50 GHz grid (`ASSUMPTION`). **Maintainer flag,
+  2026-09-12 (`TKT-033`): this figure has NO corroboration anywhere in
+  `gcb-spec`** (checked directly — exhaustive grep for "channel spacing,"
+  "DWDM," "50 GHz," "WDM" across `gcb-spec` turns up nothing matching this
+  claim). `gcb-spec/bench_emulation_parameters.md` and
+  `gcb-rtl/sim/mmi_tree_model.py` — the actual authoritative Phase I
+  spec/model — describe a **single** O-band wavelength (1310 nm) and a
+  power-summing combiner, not WDM. This line may describe a genuinely
+  separate, not-yet-built inter-chip transport link distinct from the
+  photonic MAC tile, or it may be stale/speculative text that predates
+  the Phase I bench spec settling on single-wavelength power combining.
+  Either way: **do not treat this figure as a design input for any
+  physical layout work without re-deriving it from `gcb-spec` directly**
+  — this program's own doctrine is `gcb-wiki` is a human-readable view
+  *of* `gcb-spec`, not a parallel source of truth (see `TKT-033`'s own
+  resolution in `gcb-workspaces/backlog` for the full finding).
 * FIFO depth: `D = MAX_SKEW_CYCLES = 16` at the cocotb bring-up geometry (`IMPLEMENTED`, `PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS` as a hard cap on queue depth, `TKT-019.11` §7.F).
 * Physical cell cost: Sarwate CRC32 causes a **`+45,320`** cell delta at `NUM_COLORS=60` for the mux (`TKT-019.9`, Yosys 0.68 `stat` — a synthesized structural proxy, explicitly **not** a physical PPA number).
 
