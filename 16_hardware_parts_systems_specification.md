@@ -631,21 +631,32 @@ open gap, but worth recording as a design constraint that was load-bearing.
 ### Part 12 — Phase I bench receiver chain (COTS PD + TIA + SAR ADC)
 
 **Part number / designation:** `greencoyote_adc_if.sv` (SPI SAR ADC master,
-RTL) — `gcb-rtl/rtl/`. **The photodiode, TIA, and SAR ADC themselves have
-NO vendor part number anywhere in the repository set** —
-`02_receiver_architecture.md` cites `gcb-spec/task3_physical_bom.md` §3 as
-the source for these, but **that file does not exist in `gcb-spec` (or
-anywhere else on disk)** — a genuine, open documentation gap, recorded here
-rather than papered over with a plausible-sounding part number.
+RTL) — `gcb-rtl/rtl/`. **Update, 2026-09-13 (checked directly against the
+file on disk, not assumed): the photodiode, TIA, and SAR ADC now have
+`[CANDIDATE — parametric fit]` part numbers.** `02_receiver_architecture.md`
+cites `gcb-spec/task3_physical_bom.md` §3 as the source; that file was
+re-added ~10 minutes after this gap was first recorded (2026-09-12, same
+day) and never revisited here until now. Candidates on file: a
+fiber-coupled InGaAs PIN photodiode (Thorlabs/Hamamatsu InGaAs PIN
+product-line class); an `AD8015`-class TIA (13.3 kΩ nominal, 10–20 kΩ
+adjustable, per `TKT-026`'s resolved loss-budget calc); a TI
+`ADS786x`-class 12-bit SAR ADC (matched to `greencoyote_adc_if.sv`'s
+command-word-free `CMD_WORD=16'h0000` default, per `TKT-027`'s
+resolution). **Every one is `[CANDIDATE — parametric fit]` or
+`[TBD — vendor survey not performed]`, per the BOM's own stated epistemic
+tiers — none vendor-quoted, purchased, bench-populated, or measured.**
 **Completion status:** the RTL interface is **RTL, simulated**
 ("bench loopback," per the file's own header — it is explicitly a test
 harness, not a production interface). The COTS analog chain it drives is
-**CONCEPT ONLY** in this repository set — architecturally specified
-(`02_receiver_architecture.md`'s Phase I datapath diagram) but with no
-pinned vendor/part.
+still **CONCEPT ONLY** in this repository set (no procurement, no bench
+build) — architecturally specified (`02_receiver_architecture.md`'s
+Phase I datapath diagram) and now with candidate, not zero, vendor/parts.
 **Available now:** an SPI master (mode 0, read-oriented) with a
-settle→frame→done state machine and a conversion-fault watchdog.
-**Missing:** the actual PD/TIA/ADC bill of materials.
+settle→frame→done state machine and a conversion-fault watchdog, plus the
+candidate PD/TIA/ADC BOM above.
+**Missing:** vendor quotes, procurement, bench population, and measurement
+against the candidates now on file — a real bill of materials exists;
+nothing on it has been built or bought.
 - **Role:** the "Guaranteed Bench" receiver path — proves the
   optical-summation and ratiometric-cancellation physics
   (`ADC_TapK/ADC_Tap0` cancels global insertion loss) before any Phase II
@@ -653,8 +664,11 @@ settle→frame→done state machine and a conversion-fault watchdog.
   (`02_receiver_architecture.md`).
 - **Interfaces:** SPI (mode 0) to the physical ADC; `conversion_start`
   strobe in from Part 6; `adc_data`/`adc_valid`/`conv_fault` out.
-- **Data formats:** ADC codeword width per the physical part chosen — not
-  pinned (see gap above); architecturally a digital SPI word only (the
+- **Data formats:** ADC codeword width per the physical part chosen —
+  the candidate TI `ADS786x`-class part (see above) matches
+  `greencoyote_adc_if.sv`'s existing `RESULT_BITS=12` of a `FRAME_BITS=16`
+  frame, but no part is vendor-selected/purchased yet; architecturally a
+  digital SPI word only (the
   invariant-compliance point of `02_receiver_architecture.md` — the analog
   TIA output, ~1.5 V full scale, stays on the eval board and never crosses
   the interconnect fabric).
@@ -828,9 +842,14 @@ and has never touched a commercial PDK or a physical wafer.
 
 ## Known documentation gaps (recorded, not filled)
 
-1. `gcb-spec/task3_physical_bom.md` is cited by `02_receiver_architecture.md`
+1. ~~`gcb-spec/task3_physical_bom.md` is cited by `02_receiver_architecture.md`
    §"Phase I — Guaranteed Bench" as the source for the COTS PD/TIA/SAR-ADC
-   parts (Part 12) — **this file does not exist anywhere on disk.**
+   parts (Part 12) — **this file does not exist anywhere on disk.**~~
+   **Resolved, 2026-09-13 (checked directly): the file was re-added
+   ~10 minutes after this gap was first recorded (2026-09-12, same day) —
+   see the updated Part 12 entry above for its `[CANDIDATE — parametric
+   fit]` PD/TIA/ADC part numbers. This gap sat uncorrected for a full day
+   until this check.
 2. Part 9 (DWDM laser/modulator bank) has no model, no parameter, no part
    number anywhere in the repository set — the least-specified functional
    block in the program.
