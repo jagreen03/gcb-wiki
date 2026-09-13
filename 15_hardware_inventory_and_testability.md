@@ -26,7 +26,7 @@ physical-PPA claim unless explicitly marked otherwise.
 | `gcb_dwdm_payload_demux.sv` (RX datapath) | Digital IC block | **IMPLEMENTED** (RTL) / `PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS` | Same suite; length-consistency gate (`length_mismatch`, `TKT-019.10` Finding A) independent of CRC |
 | `gcb_dwdm_deskew_cdc.sv` (CDC + deskew) | Digital IC block / contains memory (async skew FIFO) | **IMPLEMENTED** (RTL) / `PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS` (within the tested conditions enumerated in `TKT-019.11`) | `test_wdm_deskew_cdc.py` standalone suite |
 | `gcb_wavelength_router.sv` | Digital IC block | **IMPLEMENTED** (RTL), `TKT-019.1` | Elaborates at `N_LAMBDA=64` as pure permutation wiring, 0 logic cells (Yosys 0.68) |
-| `gcb_bitplane_tx_mapper.sv` / `gcb_rx_digital_recombiner.sv` | Digital IC block | **IMPLEMENTED** (RTL), `13_bitplane_tx_mapper.md` | **Provenance correction (§11.3): "forked from `gcb-photonic-qam-v2`" is UNVERIFIED by this session** — no git history or ticket evidence inspected here confirms or denies it; treat as an open provenance question, not settled fact, until independently sourced |
+| `gcb_bitplane_tx_mapper.sv` / `gcb_rx_digital_recombiner.sv` | Digital IC block | **IMPLEMENTED** (RTL), `13_bitplane_tx_mapper.md` | **Provenance: CONFIRMED, 2026-09-12 (`TKT-035`)** — `gcb-wdm-transceiver`'s own README states the fork explicitly ("`gcb_wavelength_router.sv`, `gcb_bitplane_tx_mapper.sv`, `gcb_rx_digital_recombiner.sv`, and `gcb_qam_datapath_top.sv` were forked... from `gcb-photonic-qam-v2`"), and a direct `diff` of `gcb_wavelength_router.sv` between the two repos confirms real divergence since the fork (124 lines, `N_LAMBDA`-parameterized, vs. 99 lines, the original fixed-2-color version) — no longer an open provenance question |
 | Optical PHY (lasers, modulators, photodetectors) | Photonic IC / electro-optical device | **ARCHITECTURALLY REQUIRED** / **UNKNOWN** | No optical implementation evidence exists anywhere in this epic — `TKT-019.4`'s own epistemic boundary |
 | Host interconnect (CXL/PCIe) | CXL/PCIe component | **ARCHITECTURALLY REQUIRED** / **UNKNOWN** | The system requires a host to drive CSR-sourced inputs (`current_session_nonce`, `mode_b`, `payload_len`, `start`, …) — no interconnect RTL exists |
 
@@ -243,6 +243,11 @@ corrected here:
    as fact without a verifiable source in this session.** Relabelled
    `UNVERIFIED` in §1 rather than removed outright, since it may well be
    true — it simply was not checked before being asserted.
+   **Follow-up, 2026-09-12 (`TKT-035`, a later session): CONFIRMED.**
+   `gcb-wdm-transceiver`'s own README states the fork explicitly, and a
+   direct `diff` of `gcb_wavelength_router.sv` between the two repos
+   confirms real divergence since (124 lines vs. 99). §1 updated; no
+   longer `UNVERIFIED`.
 
 No other content from the first-pass version was found to be
 inaccurate against this session's own verified sources; the CRC32 cell
