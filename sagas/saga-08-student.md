@@ -6,6 +6,15 @@
 > **Not the source of truth.** Run the real commands below against the
 > real repositories — that output is always more trustworthy than this
 > page's description of it.
+>
+> **Installing all of this at once is genuinely complex** — five
+> mostly-independent toolchains, one of which is a from-source build
+> with no shortcut. See
+> [`appendices/student-tooling-installation.md`](../appendices/student-tooling-installation.md)
+> for a base reference: what each toolchain is for, the real install
+> commands, and the gotchas already hit (a PyPI name collision, a venv
+> that must stay separate, a package that looks installable but is
+> missing the one model this program needs).
 
 ## The open-source EDA pipeline this program actually uses
 

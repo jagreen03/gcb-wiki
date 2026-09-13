@@ -4,9 +4,14 @@
 > Board / System Tester.
 >
 > **Not the source of truth.** This lens is a consolidated entry point
-> — full depth lives in [`sagas/saga-05-mechanical-eng.md`](../sagas/saga-05-mechanical-eng.md)
-> and the shared [manufacturing/test appendix](../appendices/manufacturing-pdk.md)
-> (SSOT — read once there, cited here, not re-derived).
+> — full depth lives in [`sagas/saga-05-mechanical-eng.md`](../sagas/saga-05-mechanical-eng.md),
+> the shared [manufacturing/test appendix](../appendices/manufacturing-pdk.md),
+> and the
+> [silicon & package detail appendix](../appendices/silicon-and-package-detail.md)
+> — the last one specifically covers why "the package" isn't one
+> problem here: the digital die, the analog die, and the photonic die
+> each need a different packaging discipline (SSOT — read once there,
+> cited here, not re-derived).
 >
 > **Use the depth toggle above.**
 

@@ -6,9 +6,13 @@
 > **Not the source of truth.** `gcb-spec` is. This lens is a
 > consolidated entry point — for the full derivation behind any claim
 > here, follow the link to its source saga
-> ([`sagas/`](https://github.com/jagreen03/gcb-wiki/blob/main/sagas/README.md)) or the shared
-> [manufacturing/test appendix](../appendices/manufacturing-pdk.md)
-> rather than expecting the full depth duplicated on this page (SSOT).
+> ([`sagas/`](https://github.com/jagreen03/gcb-wiki/blob/main/sagas/README.md)), the shared
+> [manufacturing/test appendix](../appendices/manufacturing-pdk.md),
+> or the
+> [silicon & package detail appendix](../appendices/silicon-and-package-detail.md)
+> — the last one exists specifically to untangle **which parts below
+> are electronic and which are photonic**, chip by chip — rather than
+> expecting the full depth duplicated on this page (SSOT).
 >
 > **Use the depth toggle above.** Executive: what's real, in one
 > screen. System: the architecture and physics. Foundry: full
@@ -28,6 +32,13 @@ photonic layout generators — but no system has been built or measured.
 packaging or silicon test program exists anywhere in this program.**
 That last sentence is not a caveat to skim past — see the Foundry tier
 below for the full, checked list of what specifically hasn't started.
+
+**If you're not sure which parts of "the silicon" are ordinary
+electronics and which are photonics** — a genuinely common point of
+confusion, since this system is both — the
+[silicon & package detail appendix](../appendices/silicon-and-package-detail.md)
+tags every real component by domain, chip by chip, before going deeper
+than this lens does.
 <!-- /depth -->
 
 <!-- depth:system -->

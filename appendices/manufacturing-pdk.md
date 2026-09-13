@@ -12,6 +12,13 @@
 > the second half is explicitly about what does **not** exist yet, and
 > quoting only the first half out of context would misrepresent this
 > program's actual manufacturing maturity.
+>
+> **For a chip-by-chip breakdown of which parts below are electronic
+> and which are photonic**, and for the package/PCB discipline each
+> domain would eventually need, see
+> [`silicon-and-package-detail.md`](silicon-and-package-detail.md) —
+> it organizes the same underlying facts by component rather than by
+> PDK/test category.
 
 ## Part 1 — What is real: digital physical design (ASAP7 / OpenROAD)
 

@@ -5,8 +5,11 @@
 >
 > **Not the source of truth.** `gcb-spec/registers.yaml` is. Full depth:
 > [`sagas/saga-07-corporate.md`](../sagas/saga-07-corporate.md) (the API
-> stack) and [`sagas/saga-08-student.md`](../sagas/saga-08-student.md)
-> (the runnable toolchain path).
+> stack), [`sagas/saga-08-student.md`](../sagas/saga-08-student.md)
+> (the runnable toolchain path), and
+> [`appendices/student-tooling-installation.md`](../appendices/student-tooling-installation.md)
+> (installing that toolchain — a base reference, since doing it all at
+> once is genuinely complex).
 >
 > **Use the depth toggle above.**
 

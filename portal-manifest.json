@@ -91,6 +91,20 @@
       "audience": "Manufacturing / Test Reference",
       "oneLine": "Real physical-design evidence, and the tapeout/PCB/board/test gap",
       "tier": "appendix"
+    },
+    {
+      "id": "silicon-package-detail",
+      "file": "appendices/silicon-and-package-detail.md",
+      "audience": "Silicon & Package Detail Reference",
+      "oneLine": "Electronics vs. photonics, chip by chip, and the small-test-chip library idea",
+      "tier": "appendix"
+    },
+    {
+      "id": "student-tooling-installation",
+      "file": "appendices/student-tooling-installation.md",
+      "audience": "Tooling Installation Reference",
+      "oneLine": "What to install for each toolchain, and the real gotchas already hit",
+      "tier": "appendix"
     }
   ]
 }

@@ -45,3 +45,14 @@ architect.md` and `02-systems-board.md` say this explicitly rather than
 inventing plausible-sounding manufacturing content — see the
 [manufacturing appendix](../appendices/manufacturing-pdk.md) for the
 full, checked gap list.
+
+## Two more reference appendices, not lenses themselves
+
+- [`silicon-and-package-detail.md`](../appendices/silicon-and-package-detail.md) —
+  a chip-by-chip electronics-vs-photonics breakdown for when the
+  silicon lens's summary isn't granular enough, plus the packaging
+  discipline each domain would eventually need.
+- [`student-tooling-installation.md`](../appendices/student-tooling-installation.md) —
+  a base reference for installing the five mostly-independent
+  toolchains this program actually uses, since doing it all at once is
+  genuinely complex.
