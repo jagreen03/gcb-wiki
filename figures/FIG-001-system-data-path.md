@@ -27,8 +27,10 @@ names the owning file(s).
    comparator vs shared ramp · 6 GHz Gray TDC ×4-phase · 3-point calib".
    Output label "`x_hat` (Q2.16)".
 5. **MMIO register block** — label "`SS_READOUT` 0xB0–0xC0 · `registers.yaml`".
-6. **Host** — label "`gcb_proxy.py` safety supervisor · `gcb-dashboard` live
-   view". Bidirectional arrow to 5.
+6. **Host** — label "`gcb_proxy.py` MMIO register simulator · `gcb-dashboard`
+   live view" (corrected 2026-09-13 — `gcb_proxy.py` is a self-checking
+   Python simulator against `registers.yaml`, not a safety-supervisory
+   component; it never describes itself that way). Bidirectional arrow to 5.
 
 **Owner band (under each stage):** 1 `gcb-rtl/integration/VX_tcu_tilefinal_tag.sv`
 · 2 `gcb-rtl/integration/VX_tcu_shim_q1714.sv` · 3
