@@ -1,11 +1,14 @@
-name: Deploy saga viewer to GitHub Pages
+name: Deploy stakeholder portal to GitHub Pages
 
 on:
   push:
     branches: [main]
     paths:
       - "viewer/**"
+      - "lenses/**"
       - "sagas/**"
+      - "appendices/**"
+      - "portal-manifest.json"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch: {}
 

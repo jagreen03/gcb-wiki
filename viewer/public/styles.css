@@ -1,4 +1,4 @@
-/* GreenCoyote-Bay Saga Viewer — responsive, light/dark-aware theme. */
+/* GreenCoyote-Bay Stakeholder Portal — responsive, light/dark-aware theme. */
 
 :root {
   --bg: #f7f8fa;
@@ -90,7 +90,7 @@ body {
   color: var(--text-muted);
 }
 
-#audience-select {
+#document-select {
   font: inherit;
   font-size: 0.9rem;
   padding: 0.4rem 0.6rem;
@@ -141,24 +141,24 @@ main {
   margin-bottom: 1rem;
 }
 
-.saga-content h1 {
+.doc-content h1 {
   font-size: 1.8rem;
   margin-top: 0;
 }
 
-.saga-content h2 {
+.doc-content h2 {
   font-size: 1.35rem;
   margin-top: 2rem;
   border-bottom: 1px solid var(--border);
   padding-bottom: 0.3rem;
 }
 
-.saga-content h3 {
+.doc-content h3 {
   font-size: 1.1rem;
   margin-top: 1.5rem;
 }
 
-.saga-content blockquote {
+.doc-content blockquote {
   border-left: 3px solid var(--accent);
   margin: 1rem 0;
   padding: 0.4rem 1rem;
@@ -167,7 +167,7 @@ main {
   border-radius: 0 6px 6px 0;
 }
 
-.saga-content table {
+.doc-content table {
   width: 100%;
   border-collapse: collapse;
   margin: 1rem 0;
@@ -176,45 +176,45 @@ main {
   display: block;
 }
 
-.saga-content table thead,
-.saga-content table tbody {
+.doc-content table thead,
+.doc-content table tbody {
   display: table;
   width: 100%;
   table-layout: fixed;
 }
 
-.saga-content th,
-.saga-content td {
+.doc-content th,
+.doc-content td {
   border: 1px solid var(--border);
   padding: 0.5rem 0.7rem;
   text-align: left;
   vertical-align: top;
 }
 
-.saga-content th {
+.doc-content th {
   background: var(--bg-elevated);
 }
 
-.saga-content code {
+.doc-content code {
   background: var(--code-bg);
   border-radius: 4px;
   padding: 0.12rem 0.35rem;
   font-size: 0.88em;
 }
 
-.saga-content pre {
+.doc-content pre {
   background: var(--code-bg);
   border-radius: 8px;
   padding: 0.9rem 1rem;
   overflow-x: auto;
 }
 
-.saga-content pre code {
+.doc-content pre code {
   background: none;
   padding: 0;
 }
 
-.saga-content .mermaid {
+.doc-content .mermaid {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -224,7 +224,7 @@ main {
   text-align: center;
 }
 
-.saga-content a {
+.doc-content a {
   color: var(--accent);
 }
 
@@ -243,6 +243,21 @@ details.depth-collapsible summary {
 
 details.depth-collapsible[open] summary {
   margin-bottom: 0.6rem;
+}
+
+.depth-section[hidden] {
+  display: none !important;
+}
+
+#document-select optgroup {
+  font-weight: 700;
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+#document-select option {
+  font-weight: 400;
+  color: var(--text);
 }
 
 /* ---------- Footer ---------- */
@@ -273,7 +288,7 @@ details.depth-collapsible[open] summary {
     align-items: stretch;
   }
 
-  #audience-select {
+  #document-select {
     max-width: none;
     width: 100%;
   }

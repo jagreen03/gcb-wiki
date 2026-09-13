@@ -1,5 +1,13 @@
-# GreenCoyote-Bay Sagas — the persona-oriented narrative portal
+# GreenCoyote-Bay Sagas — the full-depth, per-audience narrative layer
 
+> **Start at [`../lenses/`](../lenses/README.md) instead**, unless you
+> specifically want one audience's full depth in one document. The 4
+> lenses there consolidate these 8 sagas (plus 5 newly-added
+> manufacturing/test perspectives) into fewer, broader entry points with
+> a real depth toggle — these sagas are unchanged and still fully
+> supported, now reached both directly and as a lens's "full depth"
+> link-out.
+>
 > **This directory is a *narrative* layer, not the source of truth.**
 > Every saga below is a retelling, at a specific audience's depth, of
 > facts established in [`gcb-spec`](https://github.com/jagreen03/gcb-spec) and verified

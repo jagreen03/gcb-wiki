@@ -1,10 +1,10 @@
-import { FetchSagaRepository } from "./saga-repository.js";
+import { FetchDocumentRepository } from "./document-repository.js";
 import { MarkedMarkdownRenderer } from "./markdown-renderer.js";
 import { MermaidDiagramRenderer } from "./mermaid-diagram-renderer.js";
 import { KatexMathRenderer } from "./katex-math-renderer.js";
-import { GenericDepthFilter } from "./depth-filter.js";
-import { PersonaRouter } from "./persona-router.js";
-import { SagaViewerApp } from "./app.js";
+import { PortalDepthFilter } from "./portal-depth-filter.js";
+import { PortalRouter } from "./portal-router.js";
+import { PortalViewerApp } from "./app.js";
 
 /**
  * Entry point. The only file allowed to construct concrete classes -
@@ -13,44 +13,47 @@ import { SagaViewerApp } from "./app.js";
  * Mermaid theme) means editing exactly this file.
  */
 function bootstrap(): void {
-  const contentEl = requireElement<HTMLElement>("#saga-content");
-  const statusEl = requireElement<HTMLElement>("#saga-status");
-  const selectEl = requireElement<HTMLSelectElement>("#audience-select");
+  const contentEl = requireElement<HTMLElement>("#doc-content");
+  const statusEl = requireElement<HTMLElement>("#doc-status");
+  const selectEl = requireElement<HTMLSelectElement>("#document-select");
   const depthButtons = document.querySelectorAll<HTMLButtonElement>("[data-depth]");
 
-  // sagas/ is served as a sibling directory to this compiled app in the
-  // published site (see build.mjs) - "../sagas/" works identically in
-  // local dev (viewer/index.html opened next to ../sagas/) and in the
-  // built dist/ output (sagas/ copied in as dist/sagas/, viewer at
-  // dist/index.html, so "../sagas/" still resolves one level up from
-  // wherever index.html is served).
-  const repository = new FetchSagaRepository(resolveSagasBasePath());
+  // portal-manifest.json + lenses/, sagas/, appendices/ are all copied
+  // into dist/ as siblings of dist/index.html by build.mjs - see
+  // resolveBasePath()'s own doc-comment for what that implies.
+  const repository = new FetchDocumentRepository(resolveBasePath());
 
-  const app = new SagaViewerApp(
+  const app = new PortalViewerApp(
     repository,
     new MarkedMarkdownRenderer(),
     new MermaidDiagramRenderer(prefersDarkTheme() ? "dark" : "default"),
     new KatexMathRenderer(),
-    new GenericDepthFilter(),
+    new PortalDepthFilter(),
     contentEl,
     statusEl,
   );
 
-  const router = new PersonaRouter(selectEl, depthButtons, {
-    onSagaSelected: (meta) => void app.showSaga(meta),
+  const router = new PortalRouter(selectEl, depthButtons, {
+    onDocumentSelected: (meta) => void app.showDocument(meta),
     onDepthChanged: (depth) => app.setDepth(depth),
   });
 
   void app.start(router);
 }
 
-function resolveSagasBasePath(): string {
-  // A small escape hatch for hosting this viewer at a different
-  // relative depth than the default - set before this script runs:
-  //   <script>window.GCB_SAGAS_BASE_PATH = "/gcb-wiki/sagas/";</script>
-  const override = (window as unknown as { GCB_SAGAS_BASE_PATH?: string })
-    .GCB_SAGAS_BASE_PATH;
-  return override ?? "sagas/";
+function resolveBasePath(): string {
+  // build.mjs assembles dist/ as one flat site root: index.html,
+  // portal-manifest.json, lenses/, sagas/, and appendices/ all as
+  // direct siblings - so the default is "same directory as this page",
+  // i.e. no prefix. This is the only supported serving mode (build
+  // first, serve dist/ - see viewer/README.md); opening viewer/
+  // index.html directly, unbuilt, is not.
+  //
+  // Escape hatch for hosting at a different depth - set before this
+  // script runs: <script>window.GCB_PORTAL_BASE_PATH = "/some/prefix/";</script>
+  const override = (window as unknown as { GCB_PORTAL_BASE_PATH?: string })
+    .GCB_PORTAL_BASE_PATH;
+  return override ?? "";
 }
 
 function prefersDarkTheme(): boolean {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GreenCoyote-Bay — Stakeholder Sagas</title>
+  <title>GreenCoyote-Bay — Stakeholder Portal</title>
   <meta name="description" content="Persona-oriented narrative portal for the GreenCoyote-Bay (GCB / ODIN_Bridge) photonic inference fabric program." />
 
   <link rel="stylesheet" href="styles.css" />
@@ -23,30 +23,33 @@
   <header class="site-header">
     <div class="brand">
       <span class="brand-mark">GreenCoyote-Bay</span>
-      <span class="brand-sub">Stakeholder Sagas</span>
+      <span class="brand-sub">Stakeholder Portal</span>
     </div>
-    <nav class="controls" aria-label="Saga navigation">
-      <label class="audience-label" for="audience-select">I am a…</label>
-      <select id="audience-select" aria-label="Choose your audience"></select>
+    <nav class="controls" aria-label="Document navigation">
+      <label class="audience-label" for="document-select">I am a…</label>
+      <select id="document-select" aria-label="Choose your lens or saga"></select>
       <div class="depth-toggle" role="group" aria-label="Reading depth">
-        <button type="button" data-depth="overview" class="active" aria-pressed="true">Overview</button>
-        <button type="button" data-depth="full" aria-pressed="false">Full detail</button>
+        <button type="button" data-depth="executive" class="active" aria-pressed="true">Executive</button>
+        <button type="button" data-depth="system" aria-pressed="false">System</button>
+        <button type="button" data-depth="foundry" aria-pressed="false">Foundry</button>
       </div>
     </nav>
   </header>
 
   <main>
-    <p id="saga-status" class="status" role="status" hidden></p>
-    <article id="saga-content" class="saga-content"></article>
+    <p id="doc-status" class="status" role="status" hidden></p>
+    <article id="doc-content" class="doc-content"></article>
   </main>
 
   <footer class="site-footer">
     <p>
       This is a narrative retelling, not the source of truth — see
       <a href="https://github.com/jagreen03/gcb-spec" target="_blank" rel="noopener">gcb-spec</a>
-      for the authoritative register map, ADRs, and RTL-adjacent specifications, and
+      for the authoritative register map, ADRs, and RTL-adjacent specifications,
+      <a href="https://github.com/jagreen03/gcb-wiki/tree/main/lenses" target="_blank" rel="noopener">lenses/</a>
+      for the 4 consolidated entry points, and
       <a href="https://github.com/jagreen03/gcb-wiki/tree/main/sagas" target="_blank" rel="noopener">sagas/</a>
-      for the raw Markdown behind this page.
+      for the full-depth, per-audience raw Markdown behind them.
     </p>
   </footer>
 

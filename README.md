@@ -27,14 +27,20 @@ document notes where it simplifies for readability.
 
 ## Stakeholder-oriented narrative portal
 
-[`sagas/`](sagas/) is a separate, persona-oriented retelling of this
-program for eight different audiences (neighbor, math professor,
-photonics professor, electrical/mechanical engineer, investor,
-corporate contact, student) — each grounded in real, re-verified facts,
-never the source of truth itself. [`viewer/`](viewer/) is a small
-static TypeScript/HTML app that renders `sagas/` as a browsable,
-Mermaid-diagram-rendering site, deployable to GitHub Pages. Start at
-[`sagas/README.md`](sagas/README.md).
+[`lenses/`](lenses/) is the primary entry point: 4 consolidated,
+role-based documents (silicon/physical-design, systems/board,
+software/API, strategic/general-audience) — each a complete,
+standalone read at three depth levels (Executive/System/Foundry).
+[`sagas/`](sagas/) holds the 8 narrower, full-depth persona documents
+the lenses consolidate and link out to. [`appendices/`](appendices/)
+holds technical/manufacturing facts shared by more than one lens
+(single source, cited from both, never duplicated). None of these
+three is the source of truth — every claim in them is grounded in real,
+re-verified facts from `gcb-spec` and the other sibling repos.
+[`viewer/`](viewer/) is a small static TypeScript/HTML app that renders
+all three as a browsable, Mermaid-diagram-rendering, depth-toggling
+site, deployable to GitHub Pages. Start at
+[`lenses/README.md`](lenses/README.md).
 
 ## Hierarchical architecture documents
 
