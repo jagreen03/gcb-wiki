@@ -705,8 +705,21 @@ test-stimulus block per its own header).
 **Available now:** drives a single 14-bit parallel DAC bus; on each `fire`
 strobe, advances an internal LFSR test-vector generator and
 time-multiplexes `NUM_CH` channels of a trim-scaled 14-bit word onto
-`{data, channel-select, write-strobe}`. **Missing:** a pinned physical DAC
-part (same class of gap as Part 12).
+`{data, channel-select, write-strobe}`.
+**Update, 2026-09-13 (checked directly against `gcb-spec/task3_physical_bom.md`,
+which didn't exist when this entry was first written — see Part 12's own
+updated entry and gap #1 above for the timeline): a `[CANDIDATE —
+parametric fit]` DAC now exists.** `TKT-028` resolved this exact gap:
+Analog Devices **AD9767** (dual 14-bit, parallel-CMOS-input DAC — the
+same part this file's own header comment already used only as an
+*illustrative timing analogy*, now elevated to an actual candidate
+because its bus width and timing match what the RTL already assumes)
+plus an `AD8605`-class op-amp driver stage (current-to-voltage + scaling,
+since the AD9767 is current-output). Still `[CANDIDATE]`, not
+vendor-quoted/purchased — and the exact driver gain/scaling resistor
+values remain unset pending the VOA's own control-voltage range, itself
+also `[TBD]`. **Missing:** vendor quote/procurement against this
+candidate (no longer a missing part number, per se).
 - **Role:** deliberately isolates the optical path from the sequencer's
   real computed data for bench test — known pseudo-random vectors go out
   the DAC, through the (assumed) optical path, and back through Part 12's
