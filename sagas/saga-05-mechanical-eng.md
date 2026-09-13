@@ -10,6 +10,21 @@
 > layout, thermal, or clearance work.** The real numbers below come
 > from actual EDA tool output, not renders.
 
+```mermaid
+flowchart LR
+    RTL["RTL"] --> Synth["Synthesis\nA: 22,675 um^2\nB: 1,410,330 um^2 (62.2x)"]
+    Synth --> FP["Floorplan\n+ 32 macros placed + PDN"]
+    FP --> Place["Placement"]
+    Place -->|"A-operand: completed"| CTS["CTS -> Route -> GDS\nA: 0 DRC, real .gds"]
+    Place -.->|"B-operand: host memory\nceiling hit, killed"| Stop["(stopped here,\nnot a design defect)"]
+    style Stop fill:#7c2d12,color:#fff
+    style CTS fill:#10b981,color:#fff
+```
+
+*What a real physical-design run actually looked like this session —
+including the honestly-reported point where the larger design exceeded
+the build host's own memory, not a claim of universal infeasibility.*
+
 ## Real physical numbers that exist today
 
 This program has run actual OpenROAD place-and-route (ASAP7, an

@@ -23,6 +23,31 @@ own self-description rather than assumed from naming:
 | Governing model | `gcb-rtl/sim/mmi_tree_model.py`, `gcb-spec/bench_emulation_parameters.md` | `gcb-pic-core`'s component library (below) |
 | Physical maturity | **Real Vivado P&R evidence** (see `saga-04-electrical-eng.md`) | RTL + layout only, no physical validation |
 
+```mermaid
+flowchart TB
+    I0((in 0)) --> S1A[2x2 MMI]
+    I1((in 1)) --> S1A
+    I2((in 2)) --> S1B[2x2 MMI]
+    I3((in 3)) --> S1B
+    I4((in 4)) --> S1C[2x2 MMI]
+    I5((in 5)) --> S1C
+    I6((in 6)) --> S1D[2x2 MMI]
+    I7((in 7)) --> S1D
+    S1A --> S2A[2x2 MMI]
+    S1B --> S2A
+    S1C --> S2B[2x2 MMI]
+    S1D --> S2B
+    S2A --> S3[2x2 MMI]
+    S2B --> S3
+    S3 --> OUT((power-summed out))
+    style OUT fill:#10b981,color:#fff
+```
+
+*Binary MMI power-summing tree, $n=8$ — the real structure
+`mmi_power_tree.py` lays out (`N_INPUTS_SPEC`). $\lceil\log_2 8\rceil = 3$
+combiner stages; the $n=16$ Phase-II version (`N_INPUTS_PHASE2`) adds one
+more stage.*
+
 Conflating these two is a documented, previously-made error in this
 program's own history (`TKT-033`) — the fix was checking `gcb-spec`
 directly rather than trusting a secondary wiki narrative. Treat the

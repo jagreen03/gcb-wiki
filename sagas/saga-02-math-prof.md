@@ -19,6 +19,23 @@ mixer forms $A+B$ on one photodiode and $A-B$ on the other, then:
 
 $$|A+B|^2 - |A-B|^2 = 4\,\mathrm{Re}(A B^{*})$$
 
+```mermaid
+sequenceDiagram
+    participant A as Field A
+    participant B as Field B
+    participant Mix as 2x2 mixer (MZI coupler)
+    participant Tree as Power-summing tree
+    participant PD as Photodiode pair
+    A->>Mix: complex amplitude A
+    B->>Mix: complex amplitude B
+    Mix->>Tree: SUM = A + B  (stays optical)
+    Mix->>Tree: DIFF = A - B (stays optical)
+    Tree->>PD: sum-tree output
+    Tree->>PD: diff-tree output
+    PD->>PD: |SUM|^2 - |DIFF|^2 = 4 Re(A B*)
+    Note over PD: the product A*B exists as a<br/>photocurrent, never as a digital multiply
+```
+
 This is not a schematic simplification — it is the literal comment and
 implemented identity in
 [`gcb-pic-core/qam_reduction_cell.py`](../../gcb-pic-core/qam_reduction_cell.py):
