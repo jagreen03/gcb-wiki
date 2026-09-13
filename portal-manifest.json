@@ -105,6 +105,13 @@
       "audience": "Tooling Installation Reference",
       "oneLine": "What to install for each toolchain, and the real gotchas already hit",
       "tier": "appendix"
+    },
+    {
+      "id": "orange-team-collaborator",
+      "file": "appendices/orange-team-collaborator.md",
+      "audience": "Orange-Team Collaborator",
+      "oneLine": "Pick up one of the 3 real blocking photonics questions and send it to any AI",
+      "tier": "appendix"
     }
   ]
 }
