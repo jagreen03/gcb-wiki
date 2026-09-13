@@ -32,10 +32,17 @@ entry in `16_hardware_parts_systems_specification.md`):
    extraction itself has not been attempted against this specific geometry.
 2. 4:1 vs. 8:1 first-cell fan-in (`DECISION_LEDGER.md`:
    `optical.cell.fanin`) — blocked on (1).
-3. The laser/modulator bank (`16_hardware_parts_systems_specification.md`
-   Part 9) has no wavelength count, channel spacing, laser type, modulator
-   type/bandwidth, or power budget recorded anywhere — the least-specified
-   real component in the entire inventory.
+3. **Correction, found while scoping (4) below, same day**: Part 9's
+   "zero real spec" claim for the laser/modulator bank is **not accurate
+   as a blanket statement.** Two real, if modest, Phase-I bench
+   designs exist — `gcb-spec/bench_emulation_parameters.md` §2.1–2.2
+   (4–8 per-leaf lasers, the combiner-tree test bench) and
+   `gcb-spec/task3_physical_bom.md` §1 (a single CW laser + VOA, the
+   readout-calibration bench) — never reconciled against each other or
+   against Part 9's framing. What genuinely has zero spec is the
+   Phase-II integrated array: `gcb-spec/docs/optical_geometry_spec.md`
+   (LOCKED v1.0.0) is completely silent on wavelength/laser/modulator
+   (confirmed, zero matches, direct grep).
 4. The analog Rx front-end's `CONDITIONAL GO → GO` gate
    (`DECISION_LEDGER.md`: `readout.comparator.noise.spectre-histogram`)
    needs a commercial transient-noise histogram this toolchain set does
@@ -46,6 +53,20 @@ This list is meant to be revisited periodically, not answered once and
 filed away — each entry should be re-checked against the real repos the
 same way this section was built, and corrected the moment reality moves
 past it.
+
+**Each of the four questions above now has its own isolated repo** —
+deliberately separate from this program's core repo set, so a focused
+session (human or AI) can pick up exactly one of them without
+re-deriving the whole program first: (1)/(2) →
+[`gcb-lumen`](https://github.com/jagreen03/gcb-lumen) (MMI combiner-loss
+extraction + the fan-in decision it blocks); (3) →
+[`gcb-lambda`](https://github.com/jagreen03/gcb-lambda) (the laser/
+modulator-bank reconciliation, then the real Phase-II gap); (4) →
+[`gcb-kelvin`](https://github.com/jagreen03/gcb-kelvin) (the Spectre
+closure). Each carries a human-readable `README.md`, an `intent.md`
+scope boundary, and an `ai-agents/ORANGE_TEAM.md` dense AI-session
+context in the same format as this program's existing
+`gcb-spec/ai-agents/` triad.
 
 ## 1. The Domain Separation Doctrine
 
