@@ -67,9 +67,9 @@ claim, not a physical one — see §1.2.
 | Claim | What it would mean | Current status here |
 |---|---|---|
 | **Logical RTL support** | The Verilog exists and elaborates (lints clean, Yosys-blesses latch-free) | PROVEN for `gcb_dwdm_payload_mux`/`demux`, `gcb_dwdm_deskew`/`_cdc`, `gcb_wavelength_router`, at both cocotb bring-up and the GCB-034 Mode B ceiling geometry (`sim/lint.sh` 38/38; Yosys 0.68 bless, all module×geometry combinations, 0 problems/latch-free) |
-| **Demonstrated verification behavior** | A cocotb (or equivalent) testbench actually ran the scenario and it passed | PROVEN for the specific scenarios run (§4, now including the real-wire idle-gap test and the 60-lane Ghost Payload re-run, both closed by `TKT-019.10`); **UNPROVEN** for scenarios still not run (real clock skew under the new watchdog-arming gate, epoch rollover, multi-lane simultaneous stale-epoch — see §5) |
+| **Demonstrated verification behavior** | A cocotb (or equivalent) testbench actually ran the scenario and it passed | PROVEN for the specific scenarios run (§4, now including the real-wire idle-gap test and the 60-lane Ghost Payload re-run, closed by `TKT-019.10`; real clock skew under the watchdog-arming gate and multi-lane simultaneous stale-epoch, closed by `TKT-019.11`, §6.1). **CONFIRMED OPEN DEFECT under the specific scenario tested** for epoch rollover/wraparound — `TKT-019.11` ran it and it failed; see §6.1, not merely "unproven" any more |
 | **Physical feasibility** | A real optical/electrical implementation would actually work at these parameters | **Not claimed anywhere in this epic.** Every physical number in §3 is ESTIMATE/ASSUMPTION. No silicon, no optical bench, no BER measurement exists for any part of this transport |
-| **Architectural ratification** | The design is frozen; only a new falsification finding reopens it | **GCB-034 itself is ratified** (the dual-regime contract). **The integrity/mitigation layer (`TKT-019.6`/`.7`/`.8`/`.10`) is still NOT architecturally ratified** — `TKT-019.8` found two defects in its first implementation attempt, and `TKT-019.10` closed both (`PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS`, §6), but a digital regression pass is not what this row means by "ratified": no real clock skew, multi-lane simultaneous stale-epoch, epoch rollover, or physical condition has been exercised, and ratification is a separate, not-yet-taken step |
+| **Architectural ratification** | The design is frozen; only a new falsification finding reopens it | **GCB-034 itself is ratified** (the dual-regime contract). **The integrity/mitigation layer (`TKT-019.6`/`.7`/`.8`/`.10`/`.11`) is still NOT architecturally ratified** — `TKT-019.8` found two defects in its first implementation attempt, `TKT-019.10` closed both, and `TKT-019.11` closed clock-skew/multi-lane-stale under tested conditions but *found a new one* (epoch rollover aliasing, §6.1, held for disposition) — a digital regression pass is not what this row means by "ratified," and ratification remains a separate, not-yet-taken step, now with one more open item than before |
 
 A passing cocotb test is evidence for claim 2. It is never, by itself,
 evidence for claim 3, and should not be read as strengthening claim 4 even
@@ -92,7 +92,7 @@ does not let a pass on one stand in for a pass on another:
 
 | Mechanism | What it is for | Status here |
 |---|---|---|
-| **Epoch isolation** | Prevent a stale, late transaction's words from being interpreted as belonging to a later transaction (`TKT-019.6` M1/M2) | Implemented (per-word epoch tag + discard-on-mismatch pop, `TKT-019.7`'s selected path over a hard FIFO flush), with a `TKT-019.10` refinement: the CDC's bounded-wait watchdog only arms (`CDC_IDLE` → `CDC_ACTIVE`) on a real, epoch-matched word, never on `channel_enable` alone. **PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS**, including a purpose-built real-wire idle-gap test (`TKT-019.10`, §6) — the idle-gap condition that was **OPEN DEFECT** (Finding B) is now closed under tested conditions. Not proven under real clock skew, multi-lane simultaneous stale-epoch, or epoch rollover (§5). |
+| **Epoch isolation** | Prevent a stale, late transaction's words from being interpreted as belonging to a later transaction (`TKT-019.6` M1/M2) | Implemented (per-word epoch tag + discard-on-mismatch pop, `TKT-019.7`'s selected path over a hard FIFO flush), with a `TKT-019.10` refinement: the CDC's bounded-wait watchdog only arms (`CDC_IDLE` → `CDC_ACTIVE`) on a real, epoch-matched word, never on `channel_enable` alone. **PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS**, including a purpose-built real-wire idle-gap test (`TKT-019.10`, §6) — the idle-gap condition that was **OPEN DEFECT** (Finding B) is now closed under tested conditions. `TKT-019.11` (§6.1) subsequently proved the same gate under real clock skew and a multi-lane simultaneous stale-epoch population, but found epoch rollover/wraparound breaks it — a new, narrower **OPEN DEFECT**, not yet resolved. |
 | **Length consistency** | An independent, deterministic check that the accumulated byte count matches the declared `payload_len` before accepting completion (`TKT-019.6` M3) | Implemented (`TKT-019.10`): `gcb_dwdm_payload_demux` independently recomputes the expected padded word count from the decoded `{mode_b, payload_len}` and compares it to the actual accumulated word count, checked BEFORE CRC. **PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS** (§6) — the gap Finding A named is closed under tested conditions; M3 as `TKT-019.6` specified it now exists as an independent gate, not folded into CRC's coverage. |
 | **Protected completion** | `is_tile_final` + length-count + CRC must **all** agree before `payload_valid` — no single signal is ever the sole arbiter (`TKT-019.6` M4) | Implemented (`TKT-019.10`): completion now requires `is_tile_final` (implicit in reaching the check at all) **and** the length-count match **and** CRC, checked in that priority order, each with its own distinctly-named fault signal (`length_mismatch`, `integrity_fail`). **PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS** (§6) — a genuine three-way gate now exists, matching M4 as specified. |
 | **CRC / integrity** | Detect payload/framing corruption; catch `is_tile_final` corruption *indirectly* via byte-range mismatch, since CRC is never computed over that sideband bit directly | Implemented (CRC32, Sarwate byte-table form, reflected poly `0xEDB88320`). **PROVEN** to trap tested `TKT-019.5` corruption categories with a distinct `integrity_fail`, under tested conditions — 4 of 5 pre-`TKT-019.10`; post-`TKT-019.10`, 2 of those 4 are now caught FIRST by the new deterministic `length_mismatch` gate instead (CRC is only reached once length already agrees), so CRC's own `integrity_fail` count on this specific suite is 2 of 5, not a regression in CRC's coverage but a change in which mechanism is credited for catching an already-covered case. Its coverage of `is_tile_final` corruption *by itself* remains **indirect/probabilistic by construction, not deterministic** — a property of the algorithm, not a defect, and the reason `TKT-019.10` added the length gate ahead of it rather than relying on CRC alone |
@@ -231,26 +231,21 @@ verbatim in substance (see `TKT-019.9` for the full table):
 ---
 ## 5. UNPROVEN — scoped, not yet run
 
-Explicitly not claimed either way, pending further work. Two items from
-this list (the idle-gap re-run and the 60-lane Ghost Payload re-run) were
-resolved by `TKT-019.10` (§4) and are removed here, not silently left
-looking open - what remains:
+Explicitly not claimed either way, pending further work. Items from this
+list resolved by `TKT-019.10` (§4: the idle-gap re-run and the 60-lane
+Ghost Payload re-run) or by `TKT-019.11` (§6.1: real clock skew under the
+watchdog-arming gate, a multi-lane simultaneous stale-epoch population,
+and a physical re-cost of Candidate 2's RTL — all three closed under
+tested conditions) are removed here, not silently left looking open. Epoch
+rollover/wraparound moved from this list entirely — `TKT-019.11` ran it
+and it is no longer merely unproven, it is a **CONFIRMED OPEN DEFECT**,
+see §6.1. What remains genuinely unproven:
 
-- The full `TKT-019.8`/`TKT-019.10` adversarial boundary sweep beyond what
-  was actually run: stale data immediately-before/during/after N+1 (as
-  opposed to the single withheld-lane sequence actually tested), multiple
-  simultaneous stale words on multiple lanes at once, CRC-trailer-itself
-  corruption, watchdog ±1-cycle boundary, clean back-to-back transactions
-  after a recovery, and epoch rollover/wraparound (`EPOCH_W`'s mod-16
-  space) - `TKT-019.10`'s own Telemetry section names these same items as
-  explicitly not proven.
-- Real (non-zero) clock skew between lanes under the new `CDC_IDLE`/
-  `CDC_ACTIVE` watchdog-arming gate - every `TKT-019.10` regression ran on
-  a shared, zero-skew clock or the pre-existing independent-clock test
-  unrelated to the new gate; genuine cross-lane skew interacting with
-  epoch-matched activation specifically has not been exercised.
-- A physical re-cost of `TKT-019.10`'s Candidate 2 RTL (§3.5 notes this
-  explicitly - expected negligible, not measured).
+- The full `TKT-019.8`/`TKT-019.10`/`.11` adversarial boundary sweep
+  beyond what was actually run: stale data immediately-before/during/
+  after N+1 (as opposed to the specific sequences actually tested),
+  CRC-trailer-itself corruption, watchdog ±1-cycle boundary, clean
+  back-to-back transactions after a recovery.
 - Anything about real optical receivers, physical BER, or FEC necessity —
   not merely unproven but explicitly out of this epic's evidentiary reach
   (§1.2, §3.3).
@@ -358,6 +353,50 @@ original Ghost Payload finding is a different, separately-provenanced
 failure (mitigated in `TKT-019.8`, re-proven under the idle-gap condition
 in `TKT-019.10`); this doctrine does not merge their provenance.
 
+### 6.1 `TKT-019.11` — physical-boundary falsification: three closures, one new defect
+
+A falsification attempt against three of §5's previously-UNPROVEN items
+(Scopes 1/2/4), plus a digital cell-count comparison (Scope 4) — **not**
+a re-opening of `TKT-019.10`'s Findings A/B, which remain closed,
+unaffected.
+
+- **Scope 1 (real clock skew under the `CDC_IDLE`/`CDC_ACTIVE` gate) —
+  `PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS`.** Held under
+  randomized phase, a deterministic frequency offset, skew at and past
+  the FIFO's own `DEPTH`, and worst-case arrival ordering — conditions
+  `TKT-019.10` itself had not exercised.
+- **Scope 2 (multi-lane simultaneous stale/future-epoch population) —
+  `PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS`**, for the specific
+  mixed population constructed (two two-deep stale backlogs + one
+  future-epoch word + a forced void). Not an exhaustive sweep of every
+  possible population shape.
+- **Scope 4 (physical re-cost of Candidate 2) — measured, not estimated.**
+  +10 cells at both tested geometries (bring-up and the GCB-034 Mode B
+  ceiling) — cheap, by the same standard `TKT-019.9` applied to epoch
+  isolation and the watchdog, and far cheaper than CRC32's 4-5× cost.
+  Digital cell-count only, no synthesis, no timing closure, no physical
+  PPA number (§1.2).
+- **Scope 3 (epoch rollover/wraparound) — `CONFIRMED OPEN DEFECT`, NOT
+  proven closed, NOT silently patched.** Under the specific aliasing
+  construction tested (16 full wraps of `EPOCH_W`, no generation
+  counter), "matching epoch" loses the meaning Candidate 2's own
+  invariant relies on. This is **not a Candidate 2 implementation bug** —
+  Candidate 2's stated invariant held exactly as specified; the failure
+  is one level up, in what a finite-width epoch counter *can* mean after
+  enough wraps with nothing to distinguish generation N's epoch 3 from
+  generation N+1's epoch 3. Held for disposition, per this epic's
+  standing discipline against silently patching a newly-found defect.
+  **Recommended (not ratified) next action, per `TKT-019.11`'s own
+  comparison:** either pair the epoch tag with an explicit generation
+  counter, or bound the claim to "rollover-free operating windows" and
+  make that bound an explicit, checked contract rather than an implicit
+  assumption — the Architect's call, not this doctrine's.
+
+**Provenance: this Scope-3 finding originates in `TKT-019.11`**
+(2026-09-13), distinct from, and not merging the provenance of,
+`TKT-019.8`'s Findings A/B above or `TKT-019.5`'s original Ghost Payload
+finding.
+
 ---
 ## 7. Contradictions and open questions this doctrine surfaces but does not resolve
 
@@ -389,12 +428,16 @@ in `TKT-019.10`); this doctrine does not merge their provenance.
 ## 8. What this document is not
 
 Not a ratification of the optical epic. `TKT-019.10` closed `TKT-019.8`'s
-two named defects, each labelled `PROVEN — DIGITAL SIMULATION, TESTED
-CONDITIONS` (§6) — that is a specific, bounded digital-regression claim,
-**not** architectural ratification of the integrity/mitigation layer
-(§1.2), not a silicon-feasibility, optical-BER, FEC-necessity, or
-physical-receiver claim of any kind, and not a claim that every condition
-listed in §5 as still unproven has been addressed. Every physical number
-in §3 remains explicitly labelled ESTIMATE/ASSUMPTION because that is what
-it is, unaffected by anything `TKT-019.10` did. The next legitimate update
-to this document is a new finding, not a confidence adjustment.
+two named defects, and `TKT-019.11` closed three more previously-unproven
+scenarios (§6.1, Scopes 1/2/4) — each labelled `PROVEN — DIGITAL
+SIMULATION, TESTED CONDITIONS` — that is a specific, bounded
+digital-regression claim, **not** architectural ratification of the
+integrity/mitigation layer (§1.2), not a silicon-feasibility, optical-BER,
+FEC-necessity, or physical-receiver claim of any kind, and not a claim
+that every condition listed in §5 as still unproven has been addressed.
+`TKT-019.11` also *added* a new open item rather than only closing old
+ones — epoch rollover aliasing (§6.1, Scope 3) is a **confirmed open
+defect**, held for disposition, not a closure. Every physical number in
+§3 remains explicitly labelled ESTIMATE/ASSUMPTION because that is what
+it is, unaffected by anything `TKT-019.10`/`.11` did. The next legitimate
+update to this document is a new finding, not a confidence adjustment.
