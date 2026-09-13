@@ -32,14 +32,19 @@ entry in `16_hardware_parts_systems_specification.md`):
    extraction itself has not been attempted against this specific geometry.
 2. 4:1 vs. 8:1 first-cell fan-in (`DECISION_LEDGER.md`:
    `optical.cell.fanin`) — blocked on (1).
-3. **Correction, found while scoping (4) below, same day**: Part 9's
-   "zero real spec" claim for the laser/modulator bank is **not accurate
-   as a blanket statement.** Two real, if modest, Phase-I bench
-   designs exist — `gcb-spec/bench_emulation_parameters.md` §2.1–2.2
-   (4–8 per-leaf lasers, the combiner-tree test bench) and
-   `gcb-spec/task3_physical_bom.md` §1 (a single CW laser + VOA, the
-   readout-calibration bench) — never reconciled against each other or
-   against Part 9's framing. What genuinely has zero spec is the
+3. **Correction, found while scoping (4) below, same day — then
+   corrected a second time the same day, by reading more carefully**:
+   Part 9's "zero real spec" claim for the laser/modulator bank is
+   **not accurate as a blanket statement.** `gcb-spec/bench_emulation_parameters.md`
+   §2.1–2.2 and `gcb-spec/task3_physical_bom.md` §1–§2 both specify a
+   Phase-I light source for the *same* Task-3 bench (confirmed by both
+   files' own "Task 3" labeling and `02_receiver_architecture.md`'s
+   "Phase I — Guaranteed Bench" section, which states one combined
+   purpose, not two) — **but the two specs disagree on how many lasers
+   it uses**: 4–8 independent per-leaf diodes in one document, one
+   shared diode split via a 1×8 PM splitter in the other. A real,
+   unreconciled architecture question, filed as `GCB-043` for the
+   Architect, not resolved here. What genuinely has zero spec is the
    Phase-II integrated array: `gcb-spec/docs/optical_geometry_spec.md`
    (LOCKED v1.0.0) is completely silent on wavelength/laser/modulator
    (confirmed, zero matches, direct grep).

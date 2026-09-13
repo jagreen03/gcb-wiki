@@ -53,7 +53,7 @@ labels, extended with the levels this broader survey actually needs):
 | 6 | Digital Pilot FPGA controller | Digital IC block (RTL, FPGA target) | `gcb-rtl/rtl/` |
 | 7 | Streaming Tensor DMA | Digital IC block (RTL) | `gcb-rtl/rtl/` |
 | 8 | Photonic Integrated Circuit (PIC) — MZI mesh + photodiodes | Photonic IC | `gcb-pic-core/` |
-| 9 | DWDM laser/modulator bank | Photonic/electro-optic | `gcb-spec/` (bench params only) |
+| 9 | Laser/modulator bank (Phase I partially real, laser-count conflict open; Phase II CONCEPT ONLY) | Photonic/electro-optic | `gcb-spec/task3_physical_bom.md`, `gcb-spec/bench_emulation_parameters.md` |
 | 10 | On-die mixed-signal Rx front-end (integrator + comparator) | Mixed-signal block | `gcb-analog-rx/`, `gcb-spec/models/readout/` |
 | 11 | Shared TDC + calibration digital back-end | Mixed-signal/digital IC block (RTL) | `gcb-rtl/rtl/` |
 | 12 | Phase I bench receiver chain (COTS PD + TIA + SAR ADC) | Board-level / COTS electronic IC | `gcb-rtl/rtl/greencoyote_adc_if.sv` + COTS (unspecified) |
@@ -463,42 +463,68 @@ figures, any simulated or measured optical performance number.
   identical in kind to what Part 10's behavioral-model stage already
   anticipates.
 
-### Part 9 — DWDM laser/modulator bank
+### Part 9 — Laser/modulator bank (Phase I real, partial; Phase II CONCEPT ONLY)
 
-**Part number / designation:** none — referenced only as "Analog Lasers and
-Mesh" in `00_system_context.md`, owned nominally by `gcb-spec/` (bench
-parameters) and "Phase II integrated cell." **No repository contains a
-model, a component list, or a part number for this block.**
-**Completion status:** **CONCEPT ONLY.** This is the least-specified part
-in the entire inventory — even less mature than Part 8, which at least has
-a toolchain and a planned layout script.
-**Available now:** a one-line role description ("Modulated O-band sources
-into an 8×8 unitary mesh; physical superposition performs the sum").
-**Missing:** wavelength count, channel spacing, laser type (DFB/VCSEL/comb),
-modulator type/bandwidth, any power budget — none of this is recorded
-anywhere in the surveyed repositories.
+**Correction, 2026-09-13 (`gcb-lambda` research repo, see
+`gcb-wiki/appendices/research-operations.md` for the process this
+correction went through): the blanket "no repository contains a
+model... none of this is recorded anywhere" claim below was wrong.**
+Real Phase-I bench content exists, checked directly against two
+`gcb-spec` files this entry had not previously cited in full. This
+entry now separates Phase I (partially real, one open conflict) from
+Phase II (still genuinely CONCEPT ONLY).
 
-**Maintainer flag, 2026-09-12 (`TKT-033`):** beyond being Missing, this
-Part's whole DWDM/"8×8 unitary mesh" framing has **no corroboration in
-`gcb-spec`** (checked directly, not assumed) — `gcb-spec/task3_physical_bom.md`
-and `gcb-spec/bench_emulation_parameters.md` (the actual authoritative
-Phase I spec) both describe a **single** O-band (1310 nm) CW laser
-source with linear VOA intensity modulation, and a power-summing
-fused-fiber/MMI combiner — not wavelength-division multiplexing at any
-channel count. `gcb-pic-core`'s own "K=16 balanced-homodyne multiplier
-tile" near-term goal cites *this wiki document* (via `goal.md` §2) as its
-source, not `gcb-spec` directly — meaning the WDM framing this Part
-describes may have no grounding beyond this wiki page itself. Flagged
-for a human maintainer's review, not corrected unilaterally here: either
-reconcile this Part's text with `gcb-spec`'s actual single-wavelength
-model, or — if an 8×8 WDM mesh is a real, intentionally-separate Phase II
-concept — add the `gcb-spec` citation that should have grounded it from
-the start.
-- **Role:** light source + wavelength-division modulation feeding Part 8's
-  mesh.
+**Part number / designation:** Phase I: `GCB-LSR-01` [CANDIDATE]
+(laser), `GCB-VOA-01` [CANDIDATE] (modulator), `GCB-SPLT-1X8` [TBD]
+(splitter) — all in `gcb-spec/task3_physical_bom.md` §1–§2. Phase II:
+still none — referenced only as "Analog Lasers and Mesh" in
+`00_system_context.md`, no component list or part number anywhere.
+
+**Completion status — Phase I:** two real `gcb-spec` documents specify
+a light source for the same Phase-I Task-3 bench
+(`gcb-spec/bench_emulation_parameters.md` §2.1–2.2 and
+`gcb-spec/task3_physical_bom.md` §1–§2 — both explicitly labeled "Task
+3," and `gcb-wiki/02_receiver_architecture.md`'s "Phase I — Guaranteed
+Bench" section states one combined purpose for them, not two separate
+experiments) — **but the two documents disagree on how many lasers it
+uses**: 4–8 independent per-leaf diodes (`bench_emulation_parameters.md`)
+vs. one shared diode split via a 1×8 PM splitter (`task3_physical_bom.md`).
+**A real, unreconciled architecture question — filed as `GCB-043` for
+Architect disposition, not resolved here.**
+
+**Completion status — Phase II:** still **CONCEPT ONLY.** Neither
+Phase-I document addresses the real, LOCKED Phase-II integrated target
+(`gcb-spec/docs/optical_geometry_spec.md` v1.0.0: `N=64` channels,
+`L=16` contraction lanes/fire) at all — confirmed by a direct text
+search of that file for wavelength/laser/modulator terms: zero matches.
+Whether either Phase-I design scales to 64 channels, or a genuinely
+different architecture is needed at that scale, is unscoped.
+
+**Available now (Phase I, from whichever light-source design is
+eventually ratified):** O-band (~1310 nm) operation, 8-bit/256-level
+intensity modulation resolution, a target power budget
+(`task3_physical_bom.md` §3.2's loss-budget accounting). **Available
+now (Phase II):** nothing beyond the one-line role description
+("Modulated O-band sources... physical superposition performs the
+sum," `00_system_context.md`).
+
+**On the "8×8 unitary mesh"/WDM framing** (`TKT-033`'s original flag,
+still correct on its core point): `task3_physical_bom.md` §2 does use
+the phrase "8×8 unitary-mesh bench coupling emulation" — a real
+`gcb-spec` use of that language TKT-033's survey did not have in hand
+— but the same section explicitly labels it a **passive,
+single-wavelength COTS-splitter proxy, not a real WDM/wavelength-
+multiplexed claim**. `TKT-033`'s central finding (no real
+wavelength-division multiplexing anywhere in `gcb-spec`) still stands;
+only the laser-*count* question is newly and separately in question.
+- **Role:** light source + intensity modulation feeding Part 8's mesh
+  (Phase I: a bench-emulation proxy via passive COTS optics, per
+  `task3_physical_bom.md` §2's own framing, not a literal interface to
+  silicon that doesn't exist yet; Phase II: unscoped).
 - **Interfaces / data formats / performance targets / dependencies /
-  config controls:** **none specified anywhere in the repository set.**
-  This is recorded as a genuine gap, not filled in with an estimate, per
+  config controls — Phase I:** partially specified, pending `GCB-043`'s
+  resolution (see above). **Phase II:** none specified anywhere in the
+  repository set — a genuine gap, not filled in with an estimate, per
   this program's own discipline against fabricating figures that were
   never derived.
 - **Standalone testability — silicon:** N/A — no design exists to test.
@@ -912,9 +938,14 @@ and has never touched a commercial PDK or a physical wafer.
    see the updated Part 12 entry above for its `[CANDIDATE — parametric
    fit]` PD/TIA/ADC part numbers. This gap sat uncorrected for a full day
    until this check.
-2. Part 9 (DWDM laser/modulator bank) has no model, no parameter, no part
+2. ~~Part 9 (DWDM laser/modulator bank) has no model, no parameter, no part
    number anywhere in the repository set — the least-specified functional
-   block in the program.
+   block in the program.~~ **Corrected, 2026-09-13**: wrong as a blanket
+   claim — real Phase-I candidate parts exist (`GCB-LSR-01`, `GCB-VOA-01`,
+   `GCB-SPLT-1X8`, all `[CANDIDATE]`/`[TBD]`) in `gcb-spec/task3_physical_bom.md`,
+   disagreeing with `gcb-spec/bench_emulation_parameters.md` on laser
+   *count* — see the updated Part 9 entry above and `GCB-043`. Phase II
+   remains genuinely CONCEPT ONLY, unchanged.
 3. ~~Part 14 (`gcb-host`) was surveyed only at the README level this pass —
    deeper Section 2–4 detail would need a dedicated follow-up read of its
    actual source tree.~~ **Resolved, 2026-09-13** — see the updated Part 14

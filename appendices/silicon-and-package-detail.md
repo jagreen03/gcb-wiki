@@ -37,7 +37,7 @@ been fabricated, packaged, or put on a PCB.
 | 6 | Digital Pilot FPGA controller | Electronic — digital, FPGA target | RTL, simulated; targeted at Alveo U55C, **not bench-verified on one** | `gcb-rtl/rtl/` |
 | 7 | Streaming Tensor DMA | Electronic — digital | RTL, simulated | `gcb-rtl/rtl/` |
 | 8 | Photonic Integrated Circuit — MZI mesh + photodiodes | **Photonic** | **CONCEPT ONLY** — architecture + toolchain selected; **no `gdsfactory` layout, no GDS, no extracted loss figure exists on disk yet** | `gcb-pic-core/` |
-| 9 | DWDM laser/modulator bank | **Photonic / electro-optic** | **CONCEPT ONLY** — the least-specified part in the whole inventory; its "8×8 WDM mesh" framing has **no corroboration in `gcb-spec`** (flagged, unresolved) | `gcb-spec/` (bench parameters only) |
+| 9 | Laser/modulator bank | **Photonic / electro-optic** | **Phase I: partially real** — candidate parts exist, but two `gcb-spec` documents disagree on laser *count* (4–8 independent diodes vs. one split via a PM splitter — `GCB-043`, unresolved). **Phase II: CONCEPT ONLY**, zero spec at the real 64-channel target. The "8×8 unitary mesh" language is a real, `gcb-spec`-grounded bench-emulation proxy — explicitly not a WDM claim | `gcb-spec/task3_physical_bom.md`, `gcb-spec/bench_emulation_parameters.md` |
 | 10 | On-die mixed-signal Rx front-end | Electronic — **analog** | SPICE-characterized on ASAP7 (academic PDK), **CONDITIONAL GO** — one modeling uncertainty open | `gcb-analog-rx/`, `gcb-spec/models/readout/` |
 | 11 | Shared TDC + calibration back-end | Electronic — digital | RTL, simulated, bit-exact vs. a Python golden model — **standalone only, not wired into the FPGA top module** | `gcb-rtl/rtl/` |
 | 12 | Phase I bench receiver (COTS PD+TIA+ADC) | Electronic — analog (COTS parts, not GCB silicon) | RTL interface simulated; physical parts are `[CANDIDATE]`, none purchased/populated | `gcb-rtl/rtl/`, `gcb-spec/task3_physical_bom.md` |
@@ -69,7 +69,7 @@ flowchart LR
     end
     subgraph PhotonicDomain["Photonic — light physics"]
         direction TB
-        Lasers["Laser / modulator bank<br/>(Part 9 — CONCEPT ONLY)"]
+        Lasers["Laser / modulator bank<br/>(Part 9 — Phase I partial, Phase II CONCEPT ONLY)"]
         PIC["PIC: MZI mesh + photodiodes<br/>(Part 8 — CONCEPT ONLY)"]
     end
     subgraph AnalogDomain["Electronic — analog / mixed-signal"]
