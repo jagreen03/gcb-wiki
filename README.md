@@ -25,6 +25,17 @@ authoritative artifacts live in the sibling repos:
 **When a diagram here and a spec repo disagree, the spec repo wins.** Each
 document notes where it simplifies for readability.
 
+## Stakeholder-oriented narrative portal
+
+[`sagas/`](sagas/) is a separate, persona-oriented retelling of this
+program for eight different audiences (neighbor, math professor,
+photonics professor, electrical/mechanical engineer, investor,
+corporate contact, student) — each grounded in real, re-verified facts,
+never the source of truth itself. [`viewer/`](viewer/) is a small
+static TypeScript/HTML app that renders `sagas/` as a browsable,
+Mermaid-diagram-rendering site, deployable to GitHub Pages. Start at
+[`sagas/README.md`](sagas/README.md).
+
 ## Hierarchical architecture documents
 
 Level 0 is the one-screen system context; each Level 1 document drills into one
