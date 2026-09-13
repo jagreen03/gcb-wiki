@@ -2,6 +2,8 @@ import { FetchDocumentRepository } from "./document-repository.js";
 import { MarkedMarkdownRenderer } from "./markdown-renderer.js";
 import { MermaidDiagramRenderer } from "./mermaid-diagram-renderer.js";
 import { KatexMathRenderer } from "./katex-math-renderer.js";
+import { SlugHeadingAnchorer } from "./slug-heading-anchorer.js";
+import { PortalLinkRouter } from "./portal-link-router.js";
 import { PortalDepthFilter } from "./portal-depth-filter.js";
 import { PortalRouter } from "./portal-router.js";
 import { PortalViewerApp } from "./app.js";
@@ -28,13 +30,15 @@ function bootstrap(): void {
     new MarkedMarkdownRenderer(),
     new MermaidDiagramRenderer(prefersDarkTheme() ? "dark" : "default"),
     new KatexMathRenderer(),
+    new SlugHeadingAnchorer(),
+    new PortalLinkRouter(),
     new PortalDepthFilter(),
     contentEl,
     statusEl,
   );
 
   const router = new PortalRouter(selectEl, depthButtons, {
-    onDocumentSelected: (meta) => void app.showDocument(meta),
+    onDocumentSelected: (meta, fragment) => void app.showDocument(meta, fragment),
     onDepthChanged: (depth) => app.setDepth(depth),
   });
 

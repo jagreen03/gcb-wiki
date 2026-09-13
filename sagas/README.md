@@ -1,6 +1,6 @@
 # GreenCoyote-Bay Sagas — the full-depth, per-audience narrative layer
 
-> **Start at [`../lenses/`](../lenses/README.md) instead**, unless you
+> **Start at [`../lenses/`](https://github.com/jagreen03/gcb-wiki/blob/main/lenses/README.md) instead**, unless you
 > specifically want one audience's full depth in one document. The 4
 > lenses there consolidate these 8 sagas (plus 5 newly-added
 > manufacturing/test perspectives) into fewer, broader entry points with
@@ -15,7 +15,7 @@
 > a saga and `gcb-spec` (or the real repository it cites) ever
 > disagree, **`gcb-spec` wins** — file it as a bug in the saga, not a
 > new fact about the program. See
-> [`gcb-wiki`'s own standing note](../README.md) on why `gcb-wiki`
+> [`gcb-wiki`'s own standing note](https://github.com/jagreen03/gcb-wiki/blob/main/README.md) on why `gcb-wiki`
 > itself is a derived view, not authoritative.
 
 ## Who each saga is for
@@ -44,7 +44,7 @@ gets corrected when found stale.
 
 ## Viewing these in a browser
 
-[`gcb-wiki/viewer/`](../viewer/) is a small, static TypeScript/HTML
+[`gcb-wiki/viewer/`](https://github.com/jagreen03/gcb-wiki/tree/main/viewer) is a small, static TypeScript/HTML
 client that renders this `sagas/` directory (Markdown + Mermaid) as a
 navigable site, with a persona selector and a technical-depth toggle,
 deployable to GitHub Pages. See that directory's own `README.md` for

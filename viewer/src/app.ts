@@ -4,6 +4,8 @@ import type {
   IDepthFilter,
   IDiagramRenderer,
   IDocumentRepository,
+  IHeadingAnchorer,
+  ILinkRouter,
   IMarkdownRenderer,
   IMathRenderer,
 } from "./types.js";
@@ -18,39 +20,50 @@ import { PortalRouter } from "./portal-router.js";
  */
 export class PortalViewerApp {
   private currentDepth: DepthLevel = "executive";
+  private allDocuments: readonly DocumentMeta[] = [];
+  private router: PortalRouter | undefined;
 
   constructor(
     private readonly repository: IDocumentRepository,
     private readonly markdownRenderer: IMarkdownRenderer,
     private readonly diagramRenderer: IDiagramRenderer,
     private readonly mathRenderer: IMathRenderer,
+    private readonly headingAnchorer: IHeadingAnchorer,
+    private readonly linkRouter: ILinkRouter,
     private readonly depthFilter: IDepthFilter,
     private readonly contentEl: HTMLElement,
     private readonly statusEl: HTMLElement,
   ) {}
 
   async start(router: PortalRouter): Promise<void> {
+    this.router = router;
     try {
-      const documents = await this.repository.listDocuments();
-      router.initialize(documents);
+      this.allDocuments = await this.repository.listDocuments();
+      router.initialize([...this.allDocuments]);
     } catch (err) {
       this.showError(err);
     }
   }
 
-  /** Callback target for PortalRouter - fetch and render the chosen document. */
-  async showDocument(meta: DocumentMeta): Promise<void> {
+  /** Callback target for PortalRouter - fetch and render the chosen document, optionally scrolling to a heading. */
+  async showDocument(meta: DocumentMeta, fragment: string | null): Promise<void> {
     this.setStatus(`Loading "${meta.audience}"…`);
     try {
       const content = await this.repository.loadDocument(meta);
       const html = this.markdownRenderer.render(content.markdown);
       this.contentEl.innerHTML = html;
       delete this.contentEl.dataset.depthProcessed;
+
       this.mathRenderer.renderAll(this.contentEl);
       await this.diagramRenderer.renderAll(this.contentEl);
+      this.headingAnchorer.assignAll(this.contentEl);
+      this.linkRouter.wireLinks(this.contentEl, meta, this.allDocuments, (target, frag) =>
+        this.router?.navigateToDocument(target.id, frag),
+      );
       this.depthFilter.apply(this.contentEl, this.currentDepth);
+
       this.setStatus("");
-      window.scrollTo({ top: 0 });
+      this.scrollToFragmentOrTop(fragment);
     } catch (err) {
       this.showError(err);
     }
@@ -62,6 +75,18 @@ export class PortalViewerApp {
     if (this.contentEl.childElementCount > 0) {
       this.depthFilter.apply(this.contentEl, depth);
     }
+  }
+
+  private scrollToFragmentOrTop(fragment: string | null): void {
+    if (fragment) {
+      const target = this.contentEl.querySelector(`#${CSS.escape(fragment)}`);
+      if (target) {
+        target.scrollIntoView();
+        return;
+      }
+      console.warn(`[gcb-wiki portal] fragment "#${fragment}" not found in the loaded document`);
+    }
+    window.scrollTo({ top: 0 });
   }
 
   private setStatus(message: string): void {

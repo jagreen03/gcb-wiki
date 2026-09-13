@@ -6,7 +6,7 @@
 > **Not the source of truth.** `gcb-spec` is. This lens is a
 > consolidated entry point — for the full derivation behind any claim
 > here, follow the link to its source saga
-> ([`sagas/`](../sagas/README.md)) or the shared
+> ([`sagas/`](https://github.com/jagreen03/gcb-wiki/blob/main/sagas/README.md)) or the shared
 > [manufacturing/test appendix](../appendices/manufacturing-pdk.md)
 > rather than expecting the full depth duplicated on this page (SSOT).
 >
@@ -75,7 +75,7 @@ digital logic only): WNS = +0.261 ns / 602 LUT / 8 DSP48E2 on
 `xcu55c-fsvh2892-2L-e`; a complete OpenROAD ASAP7 flow to GDS on
 `gcb_tensor_a_operand_pd` (0 DRC); a real, corrected SRAM macro
 aspect-ratio fix. Full numbers, sources, and the FakeRAM power-number
-caveat: [**manufacturing appendix, Part 1**](../appendices/manufacturing-pdk.md#part-1--what-is-real-digital-physical-design-asap7--openroad).
+caveat: [**manufacturing appendix, Part 1**](../appendices/manufacturing-pdk.md#part-1-what-is-real-digital-physical-design-asap7-openroad).
 
 **What "Chip Manufacturer / Tiny Tapeout" and "Silicon Tester" would
 need, and does not have today:** ASAP7 is a predictive academic PDK —
@@ -84,7 +84,7 @@ is tapeout-ready as-is. There is no package model, no wafer-probe test
 plan, no ATE test-vector set, and no silicon has ever been fabricated
 for this program. This is not a roadmap gap being minimized — it is
 the actual, checked, current state. Full gap list:
-[**manufacturing appendix, Part 2**](../appendices/manufacturing-pdk.md#part-2--what-is-not-yet-real-tapeout-package-pcb-board-physical-test).
+[**manufacturing appendix, Part 2**](../appendices/manufacturing-pdk.md#part-2-what-is-not-yet-real-tapeout-package-pcb-board-physical-test).
 
 **Register map, for RTL-level integration work:** `registers.yaml`
 (map_version 0.6.0, 49 registers, 0x00–0xE4) is the one source, feeding

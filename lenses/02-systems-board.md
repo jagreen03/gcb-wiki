@@ -62,7 +62,7 @@ its 64× larger operand almost exactly); per-macro SRAM footprint
 generation produced an unusable ~635:1 aspect ratio). **Not real:**
 the reported 87.45 W power figure — a FakeRAM2.0 placeholder, not a
 thermal design input. Full table and sourcing:
-[**manufacturing appendix, Part 1**](../appendices/manufacturing-pdk.md#part-1--what-is-real-digital-physical-design-asap7--openroad).
+[**manufacturing appendix, Part 1**](../appendices/manufacturing-pdk.md#part-1-what-is-real-digital-physical-design-asap7-openroad).
 
 **PCB Manufacturer / Board Assembler / Board-System Tester — the
 direct, checked answer:** no PCB layer stackup, no PCB DRC rules, no
@@ -72,7 +72,7 @@ U55C card used for Track A's real FPGA results is COTS hardware, not a
 GCB board design. Full gap list and the honest ordering of what would
 need to happen first (commercial PDK → tapeout → package → PCB → board
 → board test), none of it started yet:
-[**manufacturing appendix, Part 2**](../appendices/manufacturing-pdk.md#part-2--what-is-not-yet-real-tapeout-package-pcb-board-physical-test).
+[**manufacturing appendix, Part 2**](../appendices/manufacturing-pdk.md#part-2-what-is-not-yet-real-tapeout-package-pcb-board-physical-test).
 
 **Real test evidence, at the RTL level, table + citations:**
 [**manufacturing appendix, "Digital test evidence that actually exists"**](../appendices/manufacturing-pdk.md#digital-test-evidence-that-actually-exists).

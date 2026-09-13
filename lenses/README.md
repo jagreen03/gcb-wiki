@@ -1,7 +1,7 @@
 # GreenCoyote-Bay Lenses — the consolidated entry portal
 
 > **Not the source of truth.** `gcb-spec` is. Lenses are a *fewer,
-> broader* consolidation of [`../sagas/`](../sagas/README.md)'s 8
+> broader* consolidation of [`../sagas/`](https://github.com/jagreen03/gcb-wiki/blob/main/sagas/README.md)'s 8
 > narrower persona documents plus five newly-requested manufacturing/
 > test perspectives — built because 13 standalone files was more
 > clutter than the material needed, not because the underlying detail

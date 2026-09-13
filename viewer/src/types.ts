@@ -6,7 +6,7 @@
  */
 
 /** Which collection a document belongs to - drives dropdown grouping only. */
-export type DocumentTier = "lens" | "saga";
+export type DocumentTier = "lens" | "saga" | "appendix";
 
 /** One entry from portal-manifest.json. */
 export interface DocumentMeta {
@@ -75,4 +75,33 @@ export interface IDepthFilter {
  */
 export interface IMathRenderer {
   renderAll(container: HTMLElement): void;
+}
+
+/**
+ * Assigns a unique, deterministic `id` to every heading in a container
+ * (Markdown renderers commonly do NOT do this by default - `marked`
+ * confirmed not to, empirically, before this interface was written).
+ * Required for `#fragment` links - both within a document and, via
+ * ILinkRouter, across documents - to have anything to scroll to.
+ */
+export interface IHeadingAnchorer {
+  assignAll(container: HTMLElement): void;
+}
+
+/**
+ * Rewires same-portal Markdown links (written as repo-relative paths,
+ * correct for viewing the raw file on GitHub or in an editor) to
+ * navigate within the SPA instead of letting the browser follow the
+ * href literally - which would resolve against this page's own URL,
+ * not the source document's repo location, and 404. A link that does
+ * not resolve to a document in `allDocuments` (external URLs, plain
+ * `#anchor` links) is left completely alone.
+ */
+export interface ILinkRouter {
+  wireLinks(
+    container: HTMLElement,
+    currentDoc: DocumentMeta,
+    allDocuments: readonly DocumentMeta[],
+    onNavigate: (target: DocumentMeta, fragment: string | null) => void,
+  ): void;
 }

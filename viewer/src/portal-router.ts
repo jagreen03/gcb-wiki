@@ -1,7 +1,7 @@
 import type { DepthLevel, DocumentMeta } from "./types.js";
 
 export interface PortalRouterCallbacks {
-  onDocumentSelected(meta: DocumentMeta): void;
+  onDocumentSelected(meta: DocumentMeta, fragment: string | null): void;
   onDepthChanged(depth: DepthLevel): void;
 }
 
@@ -15,8 +15,12 @@ const VALID_DEPTHS: readonly DepthLevel[] = ["executive", "system", "foundry"];
  * navigation only - never touches document content or rendering
  * directly (App composes this with the renderers).
  *
- * Also owns the URL hash (#doc=<id>&depth=<level>) so a specific
- * document + depth is directly linkable and survives a page reload.
+ * Also owns the URL hash (#doc=<id>&depth=<level>[&frag=<id>]) so a
+ * specific document + depth (+ heading, if navigated via a same-portal
+ * link) is directly linkable and survives a page reload.
+ * `navigateToDocument` is the entry point ILinkRouter's callback uses,
+ * so a clicked in-content link updates the dropdown/hash exactly like
+ * a manual selection would - one state-management path, not two.
  */
 export class PortalRouter {
   private documents: DocumentMeta[] = [];
@@ -39,18 +43,27 @@ export class PortalRouter {
     this.documents = documents;
     this.selectEl.innerHTML = "";
 
-    const lensGroup = this.buildOptGroup("Lenses — start here");
-    const sagaGroup = this.buildOptGroup("Full-depth sagas");
+    const groups: Record<DocumentMeta["tier"], HTMLOptGroupElement> = {
+      lens: this.buildOptGroup("Lenses — start here"),
+      saga: this.buildOptGroup("Full-depth sagas"),
+      appendix: this.buildOptGroup("Reference appendices"),
+    };
     for (const doc of documents) {
       const opt = document.createElement("option");
       opt.value = doc.id;
       opt.textContent = `${doc.audience} — ${doc.oneLine}`;
-      (doc.tier === "lens" ? lensGroup : sagaGroup).appendChild(opt);
+      groups[doc.tier].appendChild(opt);
     }
-    if (lensGroup.childElementCount > 0) this.selectEl.appendChild(lensGroup);
-    if (sagaGroup.childElementCount > 0) this.selectEl.appendChild(sagaGroup);
+    for (const group of Object.values(groups)) {
+      if (group.childElementCount > 0) this.selectEl.appendChild(group);
+    }
 
     this.syncFromHash();
+  }
+
+  /** Entry point for ILinkRouter's onNavigate callback - a clicked same-portal link. */
+  navigateToDocument(docId: string, fragment: string | null): void {
+    this.updateHash(docId, this.depth, fragment);
   }
 
   private buildOptGroup(label: string): HTMLOptGroupElement {
@@ -63,6 +76,7 @@ export class PortalRouter {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const docId = params.get("doc");
     const depthParam = params.get("depth");
+    const fragment = params.get("frag");
     const depth: DepthLevel = VALID_DEPTHS.includes(depthParam as DepthLevel)
       ? (depthParam as DepthLevel)
       : DEFAULT_DEPTH;
@@ -74,14 +88,14 @@ export class PortalRouter {
     this.selectEl.value = target.id;
     this.depth = depth;
     this.updateDepthButtonState();
-    this.callbacks.onDocumentSelected(target);
+    this.callbacks.onDocumentSelected(target, fragment);
     this.callbacks.onDepthChanged(this.depth);
   }
 
   private handleSelectChange(): void {
     const target = this.documents.find((d) => d.id === this.selectEl.value);
     if (!target) return;
-    this.updateHash(target.id, this.depth);
+    this.updateHash(target.id, this.depth, null);
   }
 
   private handleDepthClick(btn: HTMLButtonElement): void {
@@ -89,7 +103,7 @@ export class PortalRouter {
     this.depth = depth;
     this.updateDepthButtonState();
     const currentId = this.selectEl.value || this.documents[0]?.id;
-    if (currentId) this.updateHash(currentId, depth);
+    if (currentId) this.updateHash(currentId, depth, null);
   }
 
   private updateDepthButtonState(): void {
@@ -100,7 +114,8 @@ export class PortalRouter {
     });
   }
 
-  private updateHash(docId: string, depth: DepthLevel): void {
-    window.location.hash = `doc=${docId}&depth=${depth}`;
+  private updateHash(docId: string, depth: DepthLevel, fragment: string | null): void {
+    const fragPart = fragment ? `&frag=${fragment}` : "";
+    window.location.hash = `doc=${docId}&depth=${depth}${fragPart}`;
   }
 }

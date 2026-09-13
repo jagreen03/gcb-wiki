@@ -84,6 +84,13 @@
       "audience": "Students & Researchers",
       "oneLine": "A runnable open-source EDA/photonics tool pipeline",
       "tier": "saga"
+    },
+    {
+      "id": "manufacturing-appendix",
+      "file": "appendices/manufacturing-pdk.md",
+      "audience": "Manufacturing / Test Reference",
+      "oneLine": "Real physical-design evidence, and the tapeout/PCB/board/test gap",
+      "tier": "appendix"
     }
   ]
 }
