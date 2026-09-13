@@ -418,11 +418,12 @@ finding.
   close together in several places without a note that they come from
   different processes. Flagged, not corrected elsewhere by this doctrine.
 - This document and `GCB-039`'s README audit both independently surfaced
-  that `gcb-wiki/README.md`'s own sibling-repo index table predates several
+  that `gcb-wiki/README.md`'s own sibling-repo index table predated six
   now-active repos (`gcb-wdm-transceiver`, `gcb-photonic-qam-v2`,
   `gcb-analog-rx`, `gcb-pic-core`, `gcb-python-orchestrator`,
-  `gcb-workspaces` are all absent from it). Out of scope for this doctrine
-  to fix; noted for human disposition.
+  `gcb-workspaces`). **Fixed (2026-09-13, `README.md@bfceff7`)** — a
+  completeness omission, not an open question; descriptions drawn from
+  each repo's own README.
 
 ---
 ## 8. What this document is not
