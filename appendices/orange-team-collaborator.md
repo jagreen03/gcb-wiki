@@ -19,6 +19,13 @@
 real open questions and explore it — with another AI chat, with a
 colleague, or alone — without first reading the whole program.
 
+**Outsourcing this to more than one AI or person?** See
+[`research-operations.md`](research-operations.md) for named roles
+(Research Scientist, External Reviewer, Triage Coordinator), a
+priority scale, and the workflow for turning a finished piece of
+research into either more research or a real ticket — plus how a new
+problem gets its own section added here as new blockers surface.
+
 ## The three problems
 
 | Repo | Problem | Status as of this snapshot |

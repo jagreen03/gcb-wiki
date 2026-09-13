@@ -112,6 +112,13 @@
       "audience": "Orange-Team Collaborator",
       "oneLine": "Pick up one of the 3 real blocking photonics questions and send it to any AI",
       "tier": "appendix"
+    },
+    {
+      "id": "research-operations",
+      "file": "appendices/research-operations.md",
+      "audience": "Research Operations Coordinator",
+      "oneLine": "Roles, priority, and the harvest-to-ticket workflow for outsourcing research to more AIs or people",
+      "tier": "appendix"
     }
   ]
 }
