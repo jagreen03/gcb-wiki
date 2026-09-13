@@ -582,10 +582,12 @@ commercial run lands above 55 µV (`SPICE_RESULTS_V3.md` §11).
 **Part number / designation:** `greencoyote_ss_tdc.sv`,
 `greencoyote_ss_calib.sv` — `gcb-rtl/rtl/`.
 **Completion status:** **RTL, simulated, bit-exact-verified against a Python
-golden model.** `RTL_REPORT.md` §1: **10,000/10,000** conversions bit-exact
-between `sim/golden_ss_readout.py` and Icarus Verilog
+golden model — standalone only, not integrated into `greencoyote_top.sv`**
+(see the correction below). `RTL_REPORT.md` §1: **10,000/10,000** conversions
+bit-exact between `sim/golden_ss_readout.py` and Icarus Verilog
 (`gcb-rtl/sim/tb_ss_calib.sv`). This is, by a wide margin, the most
-rigorously cross-checked digital block in the survey.
+rigorously cross-checked digital block in the survey — at the module level;
+the system-level integration claim this entry previously made was wrong.
 **Available now:** one shared 12-bit Gray counter at 6 GHz (nominal), 4-phase
 (0/90/180/270°) capture → 24 GS/s effective / 2 fine bits; per-channel
 `{coarse, phase, fired}` capture latch across 64 channels; a 3-point
@@ -601,10 +603,31 @@ open gap, but worth recording as a design constraint that was load-bearing.
 - **Role:** converts Part 10's single comparator-strobe edge into a
   calibrated digital code — the complete digitization back-end for the
   Phase II (silicon-target) receiver path.
-- **Interfaces:** `fire[ch]` strobe in (from 64 instances of Part 10);
-  indexed readout (`{rd_ch}` → `{rd_code[13:0]}`) to the pilot (Part 6);
-  calibration coefficients arrive per-channel from the `SS_CAL` coefficient
-  BRAM in `greencoyote_pilot_regs.sv`.
+- **Correction, 2026-09-13 (checked directly, not assumed from this
+  entry's own prior text): neither `greencoyote_ss_tdc` nor
+  `greencoyote_ss_calib` is instantiated anywhere in `greencoyote_top.sv`
+  — confirmed by direct grep across all of `gcb-rtl/rtl/*.sv`, not just
+  `top`. Both exist only as standalone modules, proven solely by their
+  own dedicated testbenches (`sim/run_ss_tb.sh`) — consistent with, not
+  contradicting, this entry's own "Phase II (silicon-target)" framing
+  (Phase I's currently-integrated bench path uses `greencoyote_adc_if`/
+  `greencoyote_dac_if` instead, both of which genuinely are instantiated
+  in `top`). The "arrive... from the `SS_CAL` coefficient BRAM in
+  `greencoyote_pilot_regs.sv`" clause below was wrong as a present-tense
+  claim: that BRAM does not exist in `greencoyote_pilot_regs.sv` (zero
+  matches for any `SS_CAL`/`r_ss_*` signal there, or anywhere else in
+  `gcb-rtl`) — `greencoyote_ss_calib.sv`'s `c2`/`c1`/`c0` ports are
+  plain module inputs with no real driver anywhere today. Filed as
+  `GCB-041` for disposition — not fixed here; this is RTL-integration
+  work on the program's most rigorously-gated subsystem, not a
+  documentation-only correction.**
+- **Interfaces (as specified, not yet wired):** `fire[ch]` strobe in
+  (from 64 instances of Part 10); indexed readout (`{rd_ch}` →
+  `{rd_code[13:0]}`) intended for the pilot (Part 6); calibration
+  coefficients intended to arrive per-channel from an `SS_CAL`
+  coefficient BRAM that `registers.yaml` specifies (`SS_CAL_IDX`/
+  `SS_CAL_DATA`/`SS_RAMP_TIMING`, 0xB4-0xBC) but that has no RTL
+  implementation anywhere in this repository set.
 - **Data formats:** raw code `CW=14`-bit unsigned `{coarse[13:2], phase[1:0]}`;
   calibration coefficients signed 32-bit Q4.28; accumulator signed 48-bit
   Q4.28 (bit-exact contract with the Python golden model).
@@ -613,9 +636,10 @@ open gap, but worth recording as a design constraint that was load-bearing.
   `RTL_REPORT.md` §3c: a CML front end is required for the clock, NOT for
   the counter/capture/calibration logic, which stays static CMOS**); energy
   contribution folded into Part 10's 0.55 fJ/MAC total figure.
-- **Dependencies:** Part 10 (strobe source), Part 6's `greencoyote_pilot_regs.sv`
-  (coefficient storage, `SS_READOUT` register block 0xB0–0xC0, map_version
-  0.5.x per ADR-005).
+- **Dependencies:** Part 10 (strobe source); Part 6's
+  `greencoyote_pilot_regs.sv` for coefficient storage is a specified, not
+  yet implemented, dependency (`SS_READOUT` register block 0xB0–0xC0) —
+  see the correction above.
 - **Config/mode controls:** `SS_TDC_CTRL`, `SS_CAL_IDX`/`SS_CAL_DATA`
   (auto-increment coefficient store), `SS_RAMP_TIMING`, `SS_TDC_STATUS`.
 - **Standalone testability — silicon:** N/A, no chip — same status as every
