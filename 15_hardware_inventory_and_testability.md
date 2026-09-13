@@ -78,6 +78,18 @@ physical-PPA claim unless explicitly marked otherwise.
   — this program's own doctrine is `gcb-wiki` is a human-readable view
   *of* `gcb-spec`, not a parallel source of truth (see `TKT-033`'s own
   resolution in `gcb-workspaces/backlog` for the full finding).
+  **Follow-up, 2026-09-12 (`TKT-035`):** the concept this line is
+  reaching for is real — `gcb-papers/p2-rfi-interconnect` (the
+  "Reduction Fabric Interface," a coherent-QAM/WDM interconnect
+  replacing PCIe between compute units) specifies its own real channel
+  plan: 8 channels, 200 GHz spacing in the C-band. That is a *different*
+  specific figure than this line's 50 GHz — not a confirmation of this
+  exact number — but it confirms channel spacing is a genuine,
+  intentional transport-layer design parameter somewhere in this
+  program, not a fabricated one. Whichever figure is authoritative (this
+  line's 50 GHz, Paper 2's 200 GHz, both as different illustrative
+  scaling points, or neither as final) is still undetermined — re-derive
+  from `gcb-papers`/`gcb-spec` directly before using either.
 * FIFO depth: `D = MAX_SKEW_CYCLES = 16` at the cocotb bring-up geometry (`IMPLEMENTED`, `PROVEN — DIGITAL SIMULATION, TESTED CONDITIONS` as a hard cap on queue depth, `TKT-019.11` §7.F).
 * Physical cell cost: Sarwate CRC32 causes a **`+45,320`** cell delta at `NUM_COLORS=60` for the mux (`TKT-019.9`, Yosys 0.68 `stat` — a synthesized structural proxy, explicitly **not** a physical PPA number).
 
