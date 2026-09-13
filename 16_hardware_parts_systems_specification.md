@@ -731,22 +731,47 @@ part (same class of gap as Part 12).
 
 ### Part 14 — Host driver + MMIO control plane
 
-**Part number / designation:** `gcb-host/` (C++ pilot driver, FastAPI MMIO
-proxy, model-manifest tooling). Not independently explored file-by-file in
-this survey beyond its README's own one-line description — flagged as a
-**shallower pass than Parts 1–13** and worth a dedicated follow-up if deeper
-detail is wanted.
-**Completion status:** present as a repository with a stated role; depth of
-implementation not verified in this session.
-**Available now / missing:** not assessed at the code level this pass —
-recorded here for completeness of the parts *list* (Section 1), with full
-Section 2–4 depth deferred.
+**Part number / designation:** `gcb-host/` — three real, separate pieces,
+not one: `include/greencoyote_pilot.hpp` (795-line C++ driver, class
+`GreenCoyotePilot`, targets Alveo U55C via Xilinx Runtime (XRT) MMIO, with
+an explicit `/dev/mem` mmap fallback for bare-metal/debug access);
+`proxy/gcb_proxy.py` (313-line Python MMIO proxy/simulator, generated
+`regmap.py` `map_version 0.6.0` — composes/decodes register words only
+through the generated dataclasses, "so the proxy can never drift from
+`registers.yaml`"; implements the v0.6.0 streaming-tensor-DMA descriptor
+ring + doorbell + `REDUCTION_CTRL` surface); `tools/hf_manifest_gen.py`
+(725-line HuggingFace model-manifest generator, reads a HF
+`config.json`/`--local` path and emits a GCB hardware-resource manifest —
+a separate, standalone tool, not part of the MMIO driver stack at all, with
+its own `tests/test_hf_manifest_gen.py`).
+**Update, 2026-09-13 (deepened; checked directly, not README-only):** the
+prior entry here called `proxy/gcb_proxy.py` a "**FastAPI MMIO proxy**" —
+stale. `gcb-host`'s own README already corrected this (`TKT-032`,
+2026-09-12 23:21, `79dbba1`) to "Python MMIO register simulator," ~13
+hours **after** this document's own 10:32 creation first recorded the
+(then-accurate) FastAPI description — this entry was simply never
+revisited. Direct read of `gcb_proxy.py` confirms zero FastAPI code: it is
+a self-checking, pure-Python register simulator, not an HTTP proxy of any
+kind.
+**Completion status:** present and real — C++ driver header complete
+(4 top-level classes/functions), Python proxy/simulator complete against
+the v0.6.0 register map, manifest generator has its own test suite. Not
+independently built/run this pass (no XRT/Alveo hardware or Python
+environment exercised here) — code read directly, not executed.
+**Available now:** the full v0.6.0 MMIO surface on both the C++ (driver)
+and Python (simulator) sides; a standalone HF-model-to-hardware-manifest
+tool, unrelated to the MMIO path.
+**Missing:** independent execution/test confirmation this pass (read, not
+run); the physical host↔FPGA link is PCIe via XRT, implied by the driver's
+own API, not independently confirmed against a physical bench here.
 - **Role:** the host-side software that actually issues MMIO
   reads/writes against Part 6's register block over whatever physical link
-  connects host and FPGA (PCIe, implied but not confirmed in this survey).
+  connects host and FPGA (PCIe via XRT, per the driver's own header;
+  `/dev/mem` as the documented fallback path).
 - **Standalone testability:** software — unit/integration tests against a
   simulated or real register-map target; no photonic or analog equipment
-  involved. Not further detailed here (see note above).
+  involved. The manifest generator has its own standalone test suite,
+  independent of the MMIO path.
 
 ### Part 15 — Compiler/scheduler + telemetry persistence
 
@@ -853,9 +878,13 @@ and has never touched a commercial PDK or a physical wafer.
 2. Part 9 (DWDM laser/modulator bank) has no model, no parameter, no part
    number anywhere in the repository set — the least-specified functional
    block in the program.
-3. Part 14 (`gcb-host`) was surveyed only at the README level this pass —
+3. ~~Part 14 (`gcb-host`) was surveyed only at the README level this pass —
    deeper Section 2–4 detail would need a dedicated follow-up read of its
-   actual source tree.
+   actual source tree.~~ **Resolved, 2026-09-13** — see the updated Part 14
+   entry above: direct read of `greencoyote_pilot.hpp`, `gcb_proxy.py`, and
+   `hf_manifest_gen.py`, which also caught a stale "FastAPI MMIO proxy"
+   claim this entry had been carrying since before `gcb-host`'s own README
+   corrected it (`TKT-032`).
 4. `gcb-dashboard`'s GDS-rendering path for Part 8 (`GCB_ENABLE_PHOTONIC=1`)
    currently has nothing to render, since Part 8 has no GDS — not a defect
    in the dashboard, just a downstream consequence of Part 8's own status.
