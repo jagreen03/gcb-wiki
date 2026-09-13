@@ -75,6 +75,8 @@ check while editing.
 
 ## Deployment
 
+### GitHub Pages
+
 [`../.github/workflows/deploy-pages.yml`](../.github/workflows/deploy-pages.yml)
 builds and deploys `viewer/dist/` to GitHub Pages automatically on every
 push to `main` that touches `viewer/`, `lenses/`, `sagas/`, or
@@ -82,6 +84,35 @@ push to `main` that touches `viewer/`, `lenses/`, `sagas/`, or
 the GitHub repo itself** (this cannot be done from a commit): Settings
 → Pages → Source → "GitHub Actions". After that, pushes deploy
 automatically — no further manual steps.
+
+### Local IIS
+
+[`Deploy-CoyoteWiki.ps1`](Deploy-CoyoteWiki.ps1) builds and copies
+`dist/` into a local IIS site's physical path — tested against a real
+IIS instance, not just written and assumed to work:
+
+```powershell
+# Deploys to a known physical path directly (recommended - doesn't
+# depend on the WebAdministration PowerShell module being installed,
+# which many IIS setups don't have):
+.\Deploy-CoyoteWiki.ps1 -CustomTargetDir "C:\inetpub\wwwroot\<your-folder>"
+
+# Or let it query IIS for the Default Web Site's root and append -Alias
+# (requires the WebAdministration module; falls back to
+# C:\inetpub\wwwroot\<Alias> if that module isn't available - check
+# first that this actually matches your real IIS virtual directory's
+# physical path, since the two can silently diverge):
+.\Deploy-CoyoteWiki.ps1 -Alias "coyote"
+```
+
+**IIS has no built-in MIME type for `.md`** — without
+[`public/web.config`](public/web.config) (copied into every build's
+`dist/` automatically), IIS 404s every `lenses/`/`sagas/`/`appendices/`
+file even though they're physically deployed, because it refuses to
+serve a file extension it has no MIME mapping for. This was found by
+testing a real deployment, not assumed — if you see 404s on `.md`
+requests against a different web server, check that server's MIME-type
+configuration for `.md` specifically.
 
 ## Runtime dependencies (CDN, no bundler)
 
