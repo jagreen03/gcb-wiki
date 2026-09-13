@@ -15,6 +15,12 @@ authoritative artifacts live in the sibling repos:
 | `gcb-grants` | SBIR Phase I / II / III proposal set |
 | `gcb-papers` | academic manuscripts |
 | `gcb-dashboard` | monitoring / visualization |
+| `gcb-wdm-transceiver` | DWDM optical transport RTL — payload mux/demux, deskew/CDC, wavelength router (EPIC `TKT-019`) |
+| `gcb-photonic-qam-v2` | GCB V2.0 Photonic QAM Matrix Accelerator RTL/sim — coherent QAM constellations per DWDM color; fork source for `gcb-wdm-transceiver`'s bitplane mapper / digital recombiner |
+| `gcb-analog-rx` | Mixed-signal Rx quantizer / switched-charge integrator — the analog baseband floor of the GCB Photonic QAM Accelerator |
+| `gcb-pic-core` | Photonic Integrated Circuit component library — MZI mesh, photodiodes, MMI power trees, homodyne cells |
+| `gcb-python-orchestrator` | Host-side Python control plane — compiler/scheduler onto the Photonic/Vortex hybrid fabric, plus the Cyclopter Postgres/pgvector telemetry-persistence layer |
+| `gcb-workspaces` | Cross-repo backlog and architecture-reconciliation tickets, plus the VS Code multi-root workspace definitions grouping the `gcb-*` repos |
 
 **When a diagram here and a spec repo disagree, the spec repo wins.** Each
 document notes where it simplifies for readability.
