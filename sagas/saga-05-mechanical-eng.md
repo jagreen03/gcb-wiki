@@ -5,7 +5,7 @@
 > honest list of what physical packaging questions are still open.
 >
 > **Not the source of truth.** The concept-art chassis renders in
-> [`gcb-spec/concepts/`](../../gcb-spec/concepts/) are explicitly
+> [`gcb-spec/concepts/`](https://github.com/jagreen03/gcb-spec/tree/main/concepts) are explicitly
 > labeled AI-generated illustration, not CAD — **do not use them for
 > layout, thermal, or clearance work.** The real numbers below come
 > from actual EDA tool output, not renders.

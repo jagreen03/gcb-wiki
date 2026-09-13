@@ -2,7 +2,7 @@
 
 > **This directory is a *narrative* layer, not the source of truth.**
 > Every saga below is a retelling, at a specific audience's depth, of
-> facts established in [`gcb-spec`](../../gcb-spec/) and verified
+> facts established in [`gcb-spec`](https://github.com/jagreen03/gcb-spec) and verified
 > against real code/tool output during this program's own sessions. If
 > a saga and `gcb-spec` (or the real repository it cites) ever
 > disagree, **`gcb-spec` wins** — file it as a bug in the saga, not a

@@ -55,7 +55,7 @@ table above, not prose elsewhere, as the disambiguator.
 
 ## The waveguide mode itself — solved, not assumed
 
-[`gcb-pic-core/mode_solve_strip.py`](../../gcb-pic-core/mode_solve_strip.py)
+[`gcb-pic-core/mode_solve_strip.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/mode_solve_strip.py)
 runs a real finite-element mode solve (via `femwell`) on a
 **500 nm × 220 nm silicon strip waveguide**, SOI stack, at
 $\lambda = 1.31\,\mu\text{m}$ (O-band, matching
@@ -74,7 +74,7 @@ rather than assumed or copied from a datasheet.**
 
 ## MMI power-summing trees vs. dispersive MZI lattices — both real layouts, neither measured
 
-[`gcb-pic-core/mmi_power_tree.py`](../../gcb-pic-core/mmi_power_tree.py)
+[`gcb-pic-core/mmi_power_tree.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/mmi_power_tree.py)
 lays out a binary MMI combiner tree at two sizes, both grounded in real
 documents, not arbitrary:
 
@@ -84,8 +84,8 @@ documents, not arbitrary:
   ($L_{\text{CONTRACT}}$), **locked** in
   `gcb-spec/docs/optical_geometry_spec.md` v1.0.0.
 
-[`gcb-pic-core/wdm_combiner_tree.py`](../../gcb-pic-core/wdm_combiner_tree.py)
-and [`k16_tile.py`](../../gcb-pic-core/k16_tile.py) build the dispersive,
+[`gcb-pic-core/wdm_combiner_tree.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/wdm_combiner_tree.py)
+and [`k16_tile.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/k16_tile.py) build the dispersive,
 DWDM-lane-aware combiner geometry for Track B's $K_{\max}=16$ lanes —
 kept in the repository as real, working layout generation, but
 **explicitly flagged as not currently the targeted mechanism** once the
@@ -94,11 +94,11 @@ exact disposition history.
 
 ## The homodyne multiply cell — optical all the way to the photodiode pair
 
-[`gcb-pic-core/qam_reduction_cell.py`](../../gcb-pic-core/qam_reduction_cell.py)
+[`gcb-pic-core/qam_reduction_cell.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/qam_reduction_cell.py)
 is the component that actually implements $4\mathrm{Re}(AB^*)$ per
 [`saga-02-math-prof.md`](saga-02-math-prof.md)'s derivation:
 `multiply_tap()` (the MZI-coupler half of
-[`layout_homodyne.py`](../../gcb-pic-core/layout_homodyne.py)'s
+[`layout_homodyne.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/layout_homodyne.py)'s
 `balanced_homodyne_cell()`, with **no photodiodes at this stage** — SUM
 and DIFF stay optical) replicated across $n \in \{2,4,8,16\}$ lanes,
 feeding two `power_tree()` instances (reusing the MMI power-tree

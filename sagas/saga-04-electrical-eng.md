@@ -24,7 +24,7 @@ targeting a named, real FPGA part:
 This is genuinely **synthesized, placed, and routed** for a named part
 — a materially higher evidence tier than "RTL, digitally simulated."
 `gcb-host`'s own C++ driver
-([`greencoyote_pilot.hpp`](../../gcb-host/include/greencoyote_pilot.hpp))
+([`greencoyote_pilot.hpp`](https://github.com/jagreen03/gcb-host/blob/main/include/greencoyote_pilot.hpp))
 opens an XRT IP literally named `"greencoyote_top"`, confirming the two
 repos agree on what they're talking to.
 

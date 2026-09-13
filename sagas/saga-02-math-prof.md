@@ -5,7 +5,7 @@
 >
 > **Not the source of truth.** The equations below are restatements of
 > what is implemented in real, checked-in code. The code and the
-> register/ADR specification in [`gcb-spec`](../../gcb-spec/) are
+> register/ADR specification in [`gcb-spec`](https://github.com/jagreen03/gcb-spec) are
 > authoritative; if this page and the code ever disagree, trust the
 > code and flag this page.
 
@@ -38,7 +38,7 @@ sequenceDiagram
 
 This is not a schematic simplification — it is the literal comment and
 implemented identity in
-[`gcb-pic-core/qam_reduction_cell.py`](../../gcb-pic-core/qam_reduction_cell.py):
+[`gcb-pic-core/qam_reduction_cell.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/qam_reduction_cell.py):
 *"square-law photodiodes extract $|A+B|^2-|A-B|^2 = 4\mathrm{Re}(AB^*)$,
 the physical multiply."* **The multiplication of two complex numbers
 happens as a side effect of interference, with no digital multiplier
@@ -49,7 +49,7 @@ The real implementation keeps the multiply stage's SUM and DIFF outputs
 **optical** (no photodiodes at that stage), feeding both into separate
 $n$-input power-summing trees before the final photodiode pair —
 `multiply_tap()` × $n$ lanes into two `power_tree()` instances, per
-[`qam_reduction_cell.py`](../../gcb-pic-core/qam_reduction_cell.py).
+[`qam_reduction_cell.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/qam_reduction_cell.py).
 This reorders the $\sum_k 4\mathrm{Re}(A_k B_k^{*})$ contraction so the
 summation over $k$ also happens optically, not just the multiply.
 
@@ -72,8 +72,8 @@ propagation constant of the waveguide mode (see
 $n_{\text{eff}}$ itself comes from — it is not assumed, it is solved
 for). Cascading $N$ such stages, as in a binary combiner tree, composes
 $N$ of these matrices; the program's
-[`gcb-pic-core/wdm_combiner_tree.py`](../../gcb-pic-core/wdm_combiner_tree.py)
-and [`mmi_power_tree.py`](../../gcb-pic-core/mmi_power_tree.py) build
+[`gcb-pic-core/wdm_combiner_tree.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/wdm_combiner_tree.py)
+and [`mmi_power_tree.py`](https://github.com/jagreen03/gcb-pic-core/blob/main/mmi_power_tree.py) build
 exactly this kind of binary tree in layout form, at $n=8$ (the Phase-I
 bench cell size) and $n=16$ (the Phase-II integrated-array target,
 `N_INPUTS_PHASE2` in that file, locked against
@@ -97,7 +97,7 @@ a derivation.
 
 ## Simulation-level verification
 
-[`sim/optical_mesh_dpi.cpp`](../../gcb-photonic-qam-v2/sim/optical_mesh_dpi.cpp)
+[`sim/optical_mesh_dpi.cpp`](https://github.com/jagreen03/gcb-photonic-qam-v2/blob/main/sim/optical_mesh_dpi.cpp)
 (present, near-identically, in both `gcb-photonic-qam-v2` and
 `gcb-wdm-transceiver`) is the DPI-C numerical model a cocotb/Verilator
 testbench calls into to emulate the optical mesh's transfer-matrix

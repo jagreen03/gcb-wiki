@@ -5,7 +5,7 @@
 > and why anyone would bother.
 >
 > **Not the source of truth.** This is a friendly retelling. The real,
-> precise specification lives in [`gcb-spec`](../../gcb-spec/) — if
+> precise specification lives in [`gcb-spec`](https://github.com/jagreen03/gcb-spec) — if
 > anything here ever disagrees with that, the spec is right and this
 > page needs fixing, not the other way around.
 
