@@ -49,6 +49,11 @@ copyFile(join(here, "index.html"), dist);
 // 2. public/styles.css -> dist/styles.css
 copyFile(join(here, "public", "styles.css"), dist);
 
+// 2b. public/web.config -> dist/web.config (IIS-only: registers the .md
+//     MIME type IIS has no built-in mapping for - harmless on GitHub
+//     Pages/other static hosts, which simply ignore an unused file)
+copyFile(join(here, "public", "web.config"), dist);
+
 // 3. ../portal-manifest.json -> dist/portal-manifest.json
 copyFile(join(repoRoot, "portal-manifest.json"), dist);
 
