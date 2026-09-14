@@ -30,7 +30,7 @@ problem gets its own section added here as new blockers surface.
 
 | Repo | Problem | Status as of this snapshot |
 |---|---|---|
-| [`gcb-lumen`](https://github.com/jagreen03/gcb-lumen) | What does the real MMI power-summing combiner actually cost in insertion loss, and is the first cell 4:1 or 8:1? | Toolchain ready, extraction not yet attempted |
+| [`gcb-lumen`](https://github.com/jagreen03/gcb-lumen) | What does the real MMI power-summing combiner actually cost in insertion loss, and is the first cell 4:1 or 8:1? | **Substantially answered, 2026-09-13**: real, resolution-converged FDTD result (≈1.96 dB/junction) — not a bench measurement; the actual 4:1-vs-8:1 link-budget call remains open |
 | [`gcb-lambda`](https://github.com/jagreen03/gcb-lambda) | The "laser/modulator bank" doc is wrong as written — two real Phase-I designs exist, unreconciled; Phase-II has zero spec | Reconciliation not yet attempted |
 | [`gcb-kelvin`](https://github.com/jagreen03/gcb-kelvin) | One comparator-noise number's uncertainty band straddles its own pass/fail gate — needs one commercial-tool run this program doesn't have | Tool access not yet confirmed either way |
 

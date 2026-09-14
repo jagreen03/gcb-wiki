@@ -23,6 +23,7 @@ Evidence-doc shorthand:
 - **BENCH** = `gcb-spec/bench_emulation_parameters.md` ⇄ `gcb-rtl/sim/mmi_tree_model.py`
 - **SPENV** = `gcb-spec/docs/spice_setup.md` + `gcb-spec/scripts/setup_spice_env.sh`
 - **XYCE** = `gcb-spec/models/readout/spice/xyce_build_notes.md`
+- **LUMEN-FDTD** = `gcb-lumen/FINDINGS-2026-09-13-fdtd-v5.md` — 2D effective-index FDTD, resolution-converged through res=100 (not a bench measurement, an isolated research repo's result)
 
 | Path | Status | Evidence Doc | One-Line Reason | Date |
 |---|---|---|---|---|
@@ -53,6 +54,6 @@ Evidence-doc shorthand:
 | `toolchain.spice.xyce` | Rejected | XYCE; SR3 §6 | Xyce via conda-forge Trilinos — Trilinos build lacks NOX/LOCA and EpetraExt/BTF; a from-source Trilinos build was out of scope. | 2026-09-07 |
 | `readout.comparator.noise.spectre-histogram` | Open | SR3 §9 | A commercial (Spectre, native BSIM-CMG) transient-noise histogram to close the ±16 % surrogate uncertainty on the 53 µV number — lifts CONDITIONAL GO → GO. | 2026-09-07 |
 | `readout.comparator.preamp.gmc-fallback` | Open | SR3 §11 | g_m–C integrating preamp — documented, unbuilt; decouples gain from the 0.8 V load headroom. Build only if the Spectre histogram breaches 55 µV. | 2026-09-07 |
-| `optical.cell.combiner-loss` | Open | BENCH | Combiner / insertion loss regime of the discrete-component 8-input reduction cell — to be measured on the bench, not modelled. | 2026-09-02 |
-| `optical.cell.fanin` | Open | [Unfiled] | First reduction cell fan-in: 4:1 vs 8:1 not yet chosen. | 2026-09-02 |
+| `optical.cell.combiner-loss` | Open | BENCH; LUMEN-FDTD | Combiner / insertion loss regime of the discrete-component 8-input reduction cell — originally "to be measured on the bench, not modelled." **Real FDTD evidence now exists** (not the bench measurement this entry asked for): ≈1.96 dB/junction, resolution-converged, `gcb-lumen` 2026-09-13. Kept `Open` — a 2D approximation is not what was asked for; Architect to decide whether this is sufficient or bench confirmation is still required. | 2026-09-13 |
+| `optical.cell.fanin` | Open | [Unfiled]; LUMEN-FDTD | First reduction cell fan-in: 4:1 vs 8:1. **A real comparison now exists**: 4:1 ≈ 3.9 dB vs. 8:1 ≈ 5.9 dB total tree loss (from the FDTD result above, via `gcb-lumen/sax_combiner_model.py`) — not yet chosen; whether that tradeoff is acceptable is a link-budget call, not decided here. | 2026-09-13 |
 | `doctrine.pbg.telemetry-vector-space` | Accepted | `09_pbg_telemetry_vector_space.md`; TKT-005 | PBG taxonomy formalised as a 3D bipolar vector space — X Specification (Green/Red), Y Quality (Blue/Yellow), Z Emergence (Purple/Light-Gray); `‖T‖₂ ∈ [0, √3]`; `pgvector(3)` schema + ticket-frontmatter contract for telemetry clustering. Six colour names unchanged. | 2026-09-08 |
