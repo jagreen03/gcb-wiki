@@ -278,3 +278,15 @@ only fixes the contract.
 * **The label loses information by design.** `telemetry_color` keeps only the
   dominant spoke; the vector is the source of truth and the only thing the
   `pgvector` store should be queried on.
+* **This document defines the scoring mechanics, not the lifecycle rule
+  for when a ticket earns a grade at all.** See
+  `gcb-workspaces/backlog/GCB-044-ticket-lifecycle-and-filtering-doctrine.md`
+  for that: a ticket earns a grade only on a real closed decision — a
+  finding filed for disposition, or an audit never meant to be graded
+  on the standard R³ vector, carries no grade instead, either via
+  `telemetry_color: pending` with an absent `telemetry:` block
+  (`GCB-041`, still `open`) or by omitting `telemetry_color` entirely
+  with an explanatory comment (`TKT-019.5`, `status: done`) — both are
+  real, valid patterns; a missing grade is a signal, not an oversight.
+  That document also formalizes the append-only-correction discipline
+  already used throughout this program's real tickets.
