@@ -48,7 +48,7 @@ yesterday's state.
 |---|---|---|
 | [`gcb-lumen`](https://github.com/jagreen03/gcb-lumen) | What does the real MMI power-summing combiner actually cost in insertion loss, and is the first cell 4:1 or 8:1? | **Substantially answered, 2026-09-13**: real, resolution-converged FDTD result (≈1.96 dB/junction) — not a bench measurement. What's left open now is a physics *decomposition* (why ≈2 dB, not 0.1 or 3 dB) and the actual 4:1-vs-8:1 link-budget call |
 | [`gcb-lambda`](https://github.com/jagreen03/gcb-lambda) | The "laser/modulator bank" doc was wrong as written — two real Phase-I designs exist, with a real laser-count conflict between them; Phase-II has zero optical-source spec | **Phase-I reconciled, 2026-09-13**: real conflict found (not "two compatible designs" as first hypothesized), filed as `GCB-043` for disposition, not resolved unilaterally. **Phase-II scoped, same day**: a real question list (`PHASE2_SCOPING.md`) — Phase-I's modulator choice cannot carry forward as-is, and a real ≈20 dB splitting-loss floor is flagged for the distribution-network architecture |
-| [`gcb-kelvin`](https://github.com/jagreen03/gcb-kelvin) | One comparator-noise number's uncertainty band straddles its own pass/fail gate — needs one commercial-tool run this program doesn't have | **No commercial access, confirmed, 2026-09-13.** A genuinely new angle found and partly explored: the real target device's small-signal params (`g_m`/`g_ds`) *can* be extracted even though `.noise` can't run — revealing a real, unreconciled ≈2× discrepancy against an existing (previously-missed) analytic noise roll-up's own measured `g_m`. That discrepancy, not a new simulator, is now the live blocker |
+| [`gcb-kelvin`](https://github.com/jagreen03/gcb-kelvin) | One comparator-noise number's uncertainty band straddles its own pass/fail gate — needs one commercial-tool run this program doesn't have | **No commercial access, confirmed.** A ≈2× `g_m` gap flagged 2026-09-13 turned out, 2026-09-14, to be a non-converged-solve artifact, resolved internally (not a real device finding — see `GCB-045`). The real remaining gap is narrower: the BSIM4-surrogate's `γ_eff≈1.4` vs. the real device's own analytic roll-up assuming `γ=1.0` |
 
 ---
 
@@ -245,41 +245,56 @@ instead for maximum context.
 
 ---
 
-## 3. `gcb-kelvin` — a real ~2× gm discrepancy, not a missing tool, is now the live blocker
+## 3. `gcb-kelvin` — the gm "discrepancy" resolved internally; γ is the real remaining gap
 
-Still true: no commercial simulator is reachable, and the open-source
-toolchain's native noise analysis genuinely fails on the real device
-(confirmed twice, not assumed stale). **New since the first version of
-this page**: the real target device's small-signal parameters (`g_m`,
-`g_ds`) *can* be extracted directly, even though `.noise` can't run —
-and a real, already-built multi-stage analytic noise roll-up for this
-exact circuit (thermal + chopped-1/f + latch, two real gain stages)
-already exists in this program and had simply never been connected to
-that extraction. Running both side by side surfaced a real,
-unreconciled ≈2× gap between two independent measurements of
-"the same" device (`nfin=8`, `L=24n`) — and that gap, not simulator
-access, is now the thing actually blocking progress on this path.
+**Correction, 2026-09-14, one day after this section first shipped**:
+the ≈2× `g_m` gap this page described as "the live blocker" turned out
+not to be a real device/bias finding — re-running the actual extraction
+deck at all six bias points found roughly **half of all attempts
+deterministically converge to a non-physical operating point**
+(`v(op)` in the millions of volts), and the original 779 µS figure had
+never been checked against that before being trusted. Every
+physically-plausible re-run landed back in the existing roll-up
+script's own real range. **A genuinely useful example of `GCB-045`'s
+own point, caught live**: this was resolved by re-running a deck and
+adding one sanity check, not by the kind of deep device-physics
+diagnosis the previous version of this prompt asked a frontier AI to
+perform. Still true and unchanged: no commercial simulator is
+reachable, and the toolchain's native `.noise` genuinely fails on the
+real device. What's left, after the false alarm above, is narrower: the
+BSIM4-surrogate path's own `γ_eff≈1.4` vs. the existing roll-up's
+assumed `γ=1.0` — a real, still-open ≈13 µV-scale gap, not a missing
+tool and not a data discrepancy.
 
 <details class="depth-collapsible">
 <summary>📋 Copy this prompt — paste into any AI chat</summary>
 
 <pre>
-ROLE: Principal analog/device physicist, FinFET noise specialty. The
-question is NOT "how do I get a noise number without a commercial
-simulator" - that path already produced two real numbers that disagree.
-Diagnose the disagreement; don't propose a generic methodology.
+ROLE: Principal analog/device physicist, FinFET noise specialty. A
+prior version of this exact question turned out to be a false alarm
+(a non-converged SPICE solve mistaken for a real device discrepancy,
+caught by re-running the deck with a physical-plausibility check) -
+don't assume the data below needs the same kind of forensic diagnosis;
+the remaining gap is real but smaller and better-characterized.
 
 CIRCUIT (fixed): 2-stage chopped/auto-zeroed preamp + StrongARM latch.
 Input pair: nfin=8, L=24n, ASAP7 (7nm-class FinFET PDK), BSIM-CMG/OSDI
 model. Design point: I_tail=30 uA/stage, C_L=0.8 pF, F_chop=20 MHz,
-T_gate=20 ns (gated decision window). Target: total input-referred
-noise &lt;= 55 uV (worst-corner, for a >=56 dB system SNDR gate).
+T_gate=20 ns (gated decision window, resistively-loaded stage,
+NBW=1/(4*R_L*C_L)~=11.7 MHz at this point). Target: total
+input-referred noise &lt;= 55 uV (worst-corner, for a >=56 dB system
+SNDR gate).
 
 FAILURE LEDGER (confirmed dead ends - do not re-suggest):
 - ngspice's native ".noise" returns exactly zero on the real BSIM-CMG/
-  OSDI device, re-confirmed by re-running the actual deck, not assumed
-  stale. ".op"/".ac" DO work on the same device (gm/gds extraction is
-  fine; only ".noise" itself is broken for this OSDI integration).
+  OSDI device, re-confirmed by re-running the actual deck twice, not
+  assumed stale. ".op"/".ac" DO work on the same device, but roughly
+  HALF of single-point .op solves at this OSDI model's bias range
+  deterministically converge to a non-physical operating point
+  (v(op) far outside 0-0.8V) - ALWAYS check v(op)'s physical
+  plausibility before trusting any gm/gds extracted from this path;
+  this is a confirmed, repeatable toolchain quirk, not an occasional
+  fluke.
 - trnoise transient-noise injection gave a ~50x spread across timestep
   settings on a known reference case - not a usable method.
 - Building Xyce from source (to get a working commercial-grade .noise)
@@ -289,65 +304,52 @@ FAILURE LEDGER (confirmed dead ends - do not re-suggest):
 - No root/admin access; no Spectre or other commercial-simulator
   access at all.
 
-THE REAL, UNRECONCILED DATA DISAGREEMENT (the actual task):
-Measurement 1 - a pre-existing, already-built analytic noise roll-up
+THE REAL, REMAINING GAP (after the gm false alarm was resolved
+internally): a pre-existing, already-built analytic noise roll-up
 script (thermal: S_v=8kT*gamma/gm + 8kT/(gm^2*R_L), integrated over
 NBW=1/(4*R_L*C_L); chopped residual 1/f with real fold-back; latch
-contribution referred through G_tot=G1*G2) uses its own SPICE-MEASURED
-gm sweep: gm = 167, 218, 266, 317, 359, 395 uS at I_tail = 15, 22, 30,
-40, 50, 60 uA respectively (same nfin=8, L=24n device class). At its
-30 uA design point (gm=266 uS, R_L=26667 ohm) it gets NBW=11.7 MHz and
-a total input-referred noise of 45.8 uV at an assumed gamma=1.0.
+contribution referred through G_tot=G1*G2; real, physically-plausible
+SPICE-measured gm sweep of 167-395 uS across I_tail=15-60 uA) gets
+45.8 uV total input-referred noise at its I_tail=30uA design point,
+ASSUMING gamma (thermal excess-noise factor) = 1.0. Separately, the
+BSIM4-surrogate ".noise" path (a different, well-supported built-in
+model, used as a stand-in because the real device can't run ".noise"
+at all) gives a real 53 uV total, with gamma_eff~=1.4 read back from
+that surrogate fit - meaningfully higher than the gamma=1.0 the
+analytic roll-up assumes, and the stated reason for the two totals'
+~15% gap. ASAP7 ships no native flicker/mismatch model, so gamma is an
+assumed published-FinFET proxy in EITHER path, not measured in either.
 
-Measurement 2 - a separate, direct ".op" extraction against the SAME
-nfin=8, L=24n device (explicitly the "nmos_lvt" flavor; bias point not
-tied to any of the six I_tail values above) gives gm = 779 uS - roughly
-2x ABOVE even Measurement 1's highest-current (60 uA) point.
+TASK 1 - Is gamma_eff=1.4 (from a DIFFERENT, older BSIM4 model used as
+a surrogate) a credible estimate of the REAL target device's actual
+excess-noise factor, or is there a specific, named reason a BSIM4
+gm-matched surrogate's gamma_eff would NOT transfer accurately to a
+genuinely different (BSIM-CMG, 7nm-class FinFET) device - even though
+other small-signal parameters (gm, gds) DO transfer directly via
+.op/.ac on the real OSDI model?
 
-Separately, the BSIM4 surrogate path (a different, well-supported
-built-in model used as a stand-in because the real device can't run
-".noise" at all) gives a real 53 uV total noise with gamma_eff~=1.4
-read back from that surrogate - notably higher than the gamma=1.0
-assumed in Measurement 1's roll-up, which is the stated reason
-Measurement 1's 45.8 uV total sits below the BSIM4 surrogate's 53 uV.
+TASK 2 - Given real gm/R_L now exist for the actual target device
+(the 167-395 uS sweep) but gamma does not, is there any published-
+literature-grounded way to pin gamma more specifically for THIS exact
+device class (7nm FinFET, short-channel, near-threshold-ish bias) that
+would be more defensible than simply adopting either gamma=1.0 or
+gamma_eff=1.4 as a stand-in?
 
-TASK 1 - Diagnose the gm discrepancy (779 uS vs 167-395 uS for "the
-same" device/geometry). Rank candidate causes by plausibility: (a) a
-device-flavor mismatch (LVT vs RVT/SLVT or unspecified in Measurement
-1's own comment - LVT runs higher gm at a given bias, is that enough to
-explain ~2x on its own?), (b) a bias-point/V_gs overdrive difference
-(Measurement 2's bias wasn't tied to any of Measurement 1's six I_tail
-points - estimate what V_gs or I_D would be needed to explain the gap
-at constant device geometry), (c) an extraction-methodology artifact in
-either measurement. State what additional single piece of information
-(e.g., Measurement 2's actual I_D/V_gs, or Measurement 1's exact device
-flavor) would most cheaply disambiguate between these.
-
-TASK 2 - Assuming the gm discrepancy gets reconciled and Measurement
-1's roll-up is re-run with a real BSIM-CMG-extracted gm/R_L instead of
-its current proxy MEAS table: would that plausibly narrow the BSIM4
-surrogate's +/-16% uncertainty band (44.5-61.5 uV) in a way a commercial
-tool's correlation run would also trust, or does closing the gm gap
-leave gamma (the FinFET excess-noise factor, still an assumed published
-proxy - ASAP7 ships no native noise/mismatch model) as an equally large
-unresolved uncertainty on its own?
-
-TASK 3 - Binary verdict: is reconciling gm and re-running the existing
-analytic roll-up (no new tool, no commercial simulator) sufficient to
-responsibly sign off on tapeout readiness for this noise gate, or does
-gamma's own unverified-proxy status mean a commercial-tool correlation
-run remains mandatory regardless of how cleanly the gm gap resolves?
-Give the verdict in one sentence, then the reasoning.
+TASK 3 - Binary verdict: given everything above, does the gamma
+uncertainty alone (independent of the gm question, which is resolved)
+mean a commercial-tool correlation run remains mandatory before
+tapeout sign-off on this noise gate, or is a literature-grounded gamma
+estimate for this device class (if Task 2 finds one) sufficient?
 
 House rule, unchanged: tag every number measured / derived / assumed
 proxy. Don't claim a method narrows the uncertainty unless you state
 exactly what different noise physics it captures that the existing
 roll-up or surrogate doesn't.
 
-OUTPUT CONTRACT: a ranked candidate-cause table for Task 1 (cause |
-plausibility | disambiguating evidence needed), a short reasoned
-paragraph for Task 2, and an explicit one-sentence Go/No-Go verdict
-plus justification for Task 3.
+OUTPUT CONTRACT: a reasoned paragraph for Task 1, a literature-grounded
+gamma estimate (with citation/basis) or an honest "no defensible
+estimate exists" for Task 2, and an explicit one-sentence Go/No-Go
+verdict plus justification for Task 3.
 </pre>
 
 **For the complete version** (the real roll-up script in full, every
